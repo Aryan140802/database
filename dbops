@@ -1,0 +1,83 @@
+import oracledb
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+# Combined database mapping with credentials
+DB_CONFIG = {
+    "PR": {
+        "MIPR": {"dsn": "10.191.170.107:1787/MIIBPRDB_SRV", "user": "sys", "password": "password"},
+        "SIPR": {"dsn": "10.191.170.108:1787/sbisipr", "user": "sys", "password": "pass2"},
+        "RepoPR": {"dsn": "10.191.170.109:1787/REPODB_SRV", "user": "sys", "password": "pass3"},
+        "ArchivalPR": {"dsn": "10.191.170.110:1787/ARCHNPR_SRV", "user": "sys", "password": "pass4"},
+        "HIDR": {"dsn": "10.191.170.111:1787/hiibprdb", "user": "sys", "password": "pass5"}
+    },
+    "DR": {
+        "MIDR": {"dsn": "10.176.0.107:1787/MIBDRCDB_SRV", "user": "sys", "password": "pass6"},
+        "SIDR": {"dsn": "10.176.0.108:1787/sbisidr", "user": "sys", "password": "pass7"},
+        "RepoDR": {"dsn": "10.176.0.109:1787/SIDASHDB_SRV", "user": "sys", "password": "pass8"},
+        "ArchivalDR": {"dsn": "10.176.0.110:1787/archpdb", "user": "sys", "password": "pass9"},
+        "HIPR": {"dsn": "10.176.0.111:1521/HIIBPRDB_SRV", "user": "sys", "password": "pass10"}
+    }
+}
+
+@csrf_exempt
+def get_stats(request):
+    env = request.GET.get("env")
+    db = request.GET.get("db")
+
+    if env not in DB_CONFIG or db not in DB_CONFIG[env]:
+        return JsonResponse({"error": "Invalid environment or database name."}, status=400)
+
+    config = DB_CONFIG[env][db]
+
+    try:
+        conn = oracledb.connect(
+            user=config["user"],
+            password=config["password"],
+            dsn=config["dsn"],
+            mode=oracledb.SYSDBA
+        )
+        cursor = conn.cursor()
+
+        # FRA %
+        cursor.execute("SELECT ROUND(((SPACE_LIMIT/1024/1024/1024/1024-SPACE_USED/1024/1024/1024/1024)/(SPACE_LIMIT/1024/1024/1024/1024)*100),2) from V$RECOVERY_FILE_DEST")
+        fra = cursor.fetchone()[0]
+
+        # PR/DR Sync
+        cursor.execute("""
+            SELECT thread#, MAX(sequence#) AS seq_received
+            FROM v$archived_log
+            GROUP BY thread#
+        """)
+        received = {row[0]: row[1] for row in cursor.fetchall()}
+
+        cursor.execute("""
+            SELECT thread#, MAX(sequence#) AS seq_applied
+            FROM v$log_history
+            GROUP BY thread#
+        """)
+        applied = {row[0]: row[1] for row in cursor.fetchall()}
+
+        sync_status = []
+        for thread in sorted(set(received) | set(applied)):
+            r = received.get(thread, 0)
+            a = applied.get(thread, 0)
+            sync_status.append({
+                "thread": thread,
+                "received": r,
+                "applied": a,
+                "diff": r - a
+            })
+
+        conn.close()
+        print({
+            "fra": fra,
+            "sync_status": sync_status
+            })
+        return JsonResponse({
+            "fra": fra,
+            "sync_status": sync_status
+            })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
