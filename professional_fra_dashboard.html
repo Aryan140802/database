@@ -1,10 +1,900 @@
-PR.MIPR: cGFzc3dvcmQ=
-PR.SIPR: cGFzczI=
-PR.RepoPR: cGFzczM=
-PR.ArchivalPR: cGFzczQ=
-PR.HIDR: cGFzczU=
-DR.MIDR: cGFzczY=
-DR.SIDR: cGFzczc=
-DR.RepoDR: cGFzczg=
-DR.ArchivalDR: cGFzczk=
-DR.HIPR: cGFzczEw
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Database Monitoring Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #00cec9;
+            --text-color: #f5f6fa;
+            --dark-bg: #1e272e;
+            --darker-bg: #2d3436;
+            --card-bg: rgba(45, 52, 54, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --success-color: #00b894;
+            --warning-color: #fdcb6e;
+            --danger-color: #d63031;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 40px;
+            font-weight: 300;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            border: none;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            font-weight: 400;
+            min-width: 160px;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f5f6fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        select:focus, button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: var(--glass-shadow);
+            padding: 25px;
+            width: 280px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .card h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            font-weight: 400;
+        }
+
+        .card div {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--text-color);
+            margin-top: 10px;
+        }
+
+        .fra-warning {
+            color: var(--warning-color) !important;
+        }
+
+        .fra-danger {
+            color: var(--danger-color) !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            background: rgba(108, 92, 231, 0.1);
+            font-weight: 500;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .diff-warning {
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .diff-danger {
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+
+        select#toollinks {
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-right: 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--glass-shadow);
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 39, 46, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-spinner-container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .loading-spinner-container p {
+            margin-top: 20px;
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .spinner {
+            border: 4px solid rgba(108, 92, 231, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 300px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .sync-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .sync-table th,
+        .sync-table td {
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .sync-table th {
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 40px 0 30px;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: 300;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .db-sync-block {
+            margin-bottom: 50px;
+        }
+
+        .db-sync-block h4 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        #prdrSyncSection {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            margin-top: 30px;
+        }
+
+        #maxTable {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            margin: 30px auto;
+            max-width: 600px;
+            display: none;
+        }
+
+        #maxTable h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .no-data {
+            color: rgba(245, 246, 250, 0.5);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .column {
+                min-width: 100%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Database Monitoring Dashboard</h1>
+        <div class="controls">
+            <select id="toollinks" onchange="openToolLink(this)">
+                <option value="">Select Tool</option>
+                <option value="http://pam.sbi">PIMS</option>
+                <option value="http://10.191.170.70:7001/?root=account">GG</option>
+                <option value="https://10.191.170.69:7799/em/faces/logon/core-uifwk-console-login">OEM</option>
+                <option value="https://outlook.office.com/">Outlook</option>
+                <option value="https://10.189.37.183/">Dynatrace</option>
+            </select>
+            <select id="env" onchange="updateDBOptions()">
+                <option value="">Select Environment</option>
+                <option value="PR">PR</option>
+                <option value="DR">DR</option>
+            </select>
+            <select id="db">
+                <option value="">Select Database</option>
+            </select>
+            <button onclick="getStats()">
+                <span class="material-icons" style="font-size:18px;">query_stats</span>
+                Get Stats
+            </button>
+            <button onclick="getStats()">
+                <span class="material-icons" style="font-size:18px;">refresh</span>
+                Refresh
+            </button>
+            <button id="prdrBtn" onclick="togglePrDrSync()">
+                <span class="material-icons" style="font-size:18px;">sync_alt</span>
+                PR-DR Sync
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="card">
+                <h2>FRA Usage</h2>
+                <div id="fraPercent">--%</div>
+            </div>
+            <div class="card">
+                <h2>Active Sessions</h2>
+                <div id="activeSessions">--</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Thread</th>
+                    <th>Sequence Received</th>
+                    <th>Sequence Applied</th>
+                    <th>Difference</th>
+                </tr>
+            </thead>
+            <tbody id="syncTable">
+                <tr><td colspan="4" class="no-data">No data available. Select environment and database to load statistics.</td></tr>
+            </tbody>
+        </table>
+
+        <div id="maxTable">
+            <h3>GOLDENGATE LAG</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MI Max</th>
+                        <th>HI Max</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="miMax">--</td>
+                        <td id="hiMax">--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="prdrSyncSection" style="display:none;">
+            <div class="db-sync-block">
+                <h2 class="section-title">MIB PR and DR Sync Status</h2>
+                <div class="row">
+                    <div class="column">
+                        <h4>MIB PR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mibpr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h4>MIB DR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mibdr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-sync-block">
+                <h2 class="section-title">SI DB PR and DR Sync Status</h2>
+                <div class="row">
+                    <div class="column">
+                        <h4>SBISI PR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sipr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h4>SBISI DR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sidr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-sync-block">
+                <h2 class="section-title">Report DB PR and DR Sync Status</h2>
+                <div class="row">
+                    <div class="column">
+                        <h4>REPORT PR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportpr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h4>REPORT DR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportdr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-sync-block">
+                <h2 class="section-title">NEW ARCHIVAL DB PR and DR Sync Status</h2>
+                <div class="row">
+                    <div class="column">
+                        <h4>Archival New PR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archnpr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h4>Archival New DR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archndr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-sync-block">
+                <h2 class="section-title">OLD ARCHIVAL DB PR and DR Sync Status</h2>
+                <div class="row">
+                    <div class="column">
+                        <h4>Old Archival PR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archpr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="column">
+                        <h4>Old Archival DR</h4>
+                        <table class="sync-table">
+                            <thead>
+                                <tr>
+                                    <th>Thread</th>
+                                    <th>Sequence Received</th>
+                                    <th>Sequence Applied</th>
+                                    <th>Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archdr">
+                                <tr><td colspan="4" class="no-data">No data available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dbOptions = {
+            PR: ["MIPR", "SIPR", "RepoPR", "ArchivalPR", "HIDR"],
+            DR: ["MIDR", "SIDR", "RepoDR", "ArchivalDR", "HIPR"]
+        };
+
+        function updateDBOptions() {
+            const env = document.getElementById("env").value;
+            const dbDropdown = document.getElementById("db");
+            dbDropdown.innerHTML = '<option value="">Select Database</option>';
+            if (dbOptions[env]) {
+                dbOptions[env].forEach(db => {
+                    const option = document.createElement("option");
+                    option.value = db;
+                    option.textContent = db;
+                    dbDropdown.appendChild(option);
+                });
+            }
+        }
+
+        function getStats() {
+            const env = document.getElementById("env").value;
+            const db = document.getElementById("db").value;
+            if (!env || !db) {
+                alert("Please select both Environment and Database.");
+                return;
+            }
+
+            // Show loading state
+            document.getElementById("fraPercent").textContent = "--";
+            document.getElementById("activeSessions").textContent = "--";
+            document.getElementById("syncTable").innerHTML = "<tr><td colspan='4'><div class='spinner'></div> Loading data...</td></tr>";
+            document.getElementById("maxTable").style.display = "none";
+
+            // Make API call to fetch real data
+            fetch(`get_stats/?env=${env}&db=${db}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Update FRA Usage
+                    const fraPercentElement = document.getElementById("fraPercent");
+                    fraPercentElement.textContent = `${data.fra}%`;
+                    
+                    // Apply color coding based on FRA percentage
+                    fraPercentElement.className = '';
+                    if (data.fra >= 80) {
+                        fraPercentElement.classList.add('fra-danger');
+                    } else if (data.fra >= 70) {
+                        fraPercentElement.classList.add('fra-warning');
+                    }
+                    
+                    // Update Active Sessions
+                    document.getElementById("activeSessions").textContent = data.active_sessions;
+                    
+                    // Update Sync Table
+                    const syncTable = document.getElementById("syncTable");
+                    syncTable.innerHTML = "";
+                    
+                    if (data.sync_status && data.sync_status.length > 0) {
+                        data.sync_status.forEach(row => {
+                            const tr = document.createElement("tr");
+                            let diffClass = '';
+                            
+                            // Fixed: Convert diff to string before using replace, handle both string and number cases
+                            const diffValue = String(row.diff || '0'); // Convert to string, default to '0' if null/undefined
+                            const diff = parseInt(diffValue.replace(/,/g, '')) || 0; // Remove commas and parse, default to 0
+                            
+                            if (diff > 1000) {
+                                diffClass = 'diff-danger';
+                            } else if (diff > 100) {
+                                diffClass = 'diff-warning';
+                            }
+                            
+                            tr.innerHTML = `
+                                <td>${row.thread || '--'}</td>
+                                <td>${row.received || '--'}</td>
+                                <td>${row.applied || '--'}</td>
+                                <td class="${diffClass}">${row.diff === undefined || row.diff === null ? '--' : row.diff}</td>
+                            `;
+                            syncTable.appendChild(tr);
+                        });
+                    } else {
+                        syncTable.innerHTML = "<tr><td colspan='4' class='no-data'>No synchronization data available</td></tr>";
+                    }
+                    
+                    // Update Max Table if applicable
+                    if (env === "PR" && db === "ArchivalPR") {
+                        document.getElementById("maxTable").style.display = "block";
+                        document.getElementById("miMax").textContent = data.mi_max || "--";
+                        document.getElementById("hiMax").textContent = data.hi_max || "--";
+                    } else {
+                        document.getElementById("maxTable").style.display = "none";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById("syncTable").innerHTML = `<tr><td colspan='4' style='color:var(--danger-color)'>Error: ${error.message}</td></tr>`;
+                });
+        }
+
+        function openToolLink(selectElement) {
+            const url = selectElement.value;
+            if (url) {
+                window.open(url, '_blank');
+                selectElement.selectedIndex = 0;
+            }
+        }
+
+        function togglePrDrSync() {
+            const section = document.getElementById("prdrSyncSection");
+            section.style.display = section.style.display === "none" ? "block" : "none";
+            if (section.style.display === "block") {
+                // Show loading state
+                const tables = ["mibpr", "mibdr", "sipr", "sidr", "reportpr", "reportdr", "archnpr", "archndr", "archpr", "archdr"];
+                tables.forEach(id => {
+                    document.getElementById(id).innerHTML = "<tr><td colspan='4'><div class='spinner'></div> Loading data...</td></tr>";
+                });
+                
+                // Fetch all sync status data
+                fetchAllSyncStatus();
+            }
+        }
+
+        function fetchAllSyncStatus() {
+            fetch('/api/get-all-sync-status/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Process PR-DR pairs
+                    const pairs = [
+                        { pr: "mibpr", dr: "mibdr", prEnv: "MIPR", drEnv: "MIDR" },
+                        { pr: "sipr", dr: "sidr", prEnv: "SIPR", drEnv: "SIDR" },
+                        { pr: "reportpr", dr: "reportdr", prEnv: "RepoPR", drEnv: "RepoDR" },
+                        { pr: "archnpr", dr: "archndr", prEnv: "ArchivalPR", drEnv: "ArchivalDR" },
+                        { pr: "archpr", dr: "archdr", prEnv: "ArchivalPR", drEnv: "ArchivalDR" }
+                    ];
+                    
+                    pairs.forEach(pair => {
+                        const prData = data.find(item => item.env === pair.prEnv);
+                        const drData = data.find(item => item.env === pair.drEnv);
+                        
+                        updateSyncTable(pair.pr, prData ? prData.sync_status : null);
+                        updateSyncTable(pair.dr, drData ? drData.sync_status : null);
+                    });
+                })
+                .catch(error => {
+                    alert("Error fetching data: " + error);
+                });
+        }
+        function openToolLink(selectElement){
+                            const url = selectElement.value;
+                            if(url) {
+                                                window.open(url, '_blank');
+                                                selectElement.selectedIndex = 0;
+                        }
+                }
+
+/*
+        function togglePrDrSync(){
+        const section = document.getElementById("prdrSyncSection");
+        section.style.display = section.style.display === "none"? "block" : "none";
+        if(section.style.display === "block") {
+                fetchSyncStatus();
+        }
+}
+
+function prdrSyncSection(){
+        fetch("/api/get-all-sync-status/").then(response => response.json()).then(data => {
+                data.forEach(item => {
+                        let prId = "", drId = "";
+                        if(item.pr_env === "MIPR" && item.pr_env === "MIDR"){
+                                prId = "mibpr"; drId = "mibdr";
+                        } else if(item.pr_env === "SIPR" && item.pr_env === "SIDR"){
+                                prId = "sipr"; drId = "sidr";
+                        } else if(item.pr_env === "RepoPR" && item.pr_env === "RepoDR") {
+                                prId = "reportpr"; drId = "reportdr";
+                        } else if(item.pr_env === "ArchivalPR" && item.pr_env === "ArchivalPR") {
+                                prId = "archnpr"; drId = "archndr";
+                        }
+
+                        if(prID && drId){
+                                document.getElementById(prId).innerHTML = "";
+                                item.pr_sync_data.forEach(row => {
+                                        document.getElementById(prId).innerHTML += `
+                                                <tr>
+                                                        <td>${row.thread}</td>
+                                                        <td>${row.received}</td>
+                                                        <td>${row.applied}</td>
+                                                        <td>${row.diff}</td>
+                                                </tr>`;
+                        });
+
+                        document.getElementById(drId).innerHTML = "";
+                                item.pr_sync_data.forEach(row => {
+                                        document.getElementById(drId).innerHTML += `
+                                                <tr>
+                                                        <td>${row.thread}</td>
+                                                        <td>${row.received}</td>
+                                                        <td>${row.applied}</td>
+                                                        <td>${row.diff}</td>
+                                                </tr>`;
+                        });
+                }
+        });
+                            */
+    </script>
+</body>
+</html>
