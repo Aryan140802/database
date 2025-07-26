@@ -1,0 +1,47 @@
+SERVER CONFIGURATION
+EISHome_compliance
+mysql> describe EISHome_compliance
+    -> ;
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| id            | bigint       | NO   | PRI | NULL    | auto_increment |
+| ip_address    | varchar(20)  | NO   |     | NULL    |                |
+| last_update   | varchar(50)  | NO   |     | NULL    |                |
+| upTime        | varchar(50)  | NO   |     | NULL    |                |
+| server_role   | varchar(50)  | NO   |     | NULL    |                |
+| ram           | int          | NO   |     | NULL    |                |
+| cpuCore       | int          | NO   |     | NULL    |                |
+| osVersion     | varchar(100) | NO   |     | NULL    |                |
+| kernelUdate   | varchar(100) | NO   |     | NULL    |                |
+| aceVersion    | varchar(20)  | NO   |     | NULL    |                |
+| mqVersion     | varchar(30)  | NO   |     | NULL    |                |
+| firewall      | varchar(50)  | NO   |     | NULL    |                |
+| rpmCount      | int          | NO   |     | NULL    |                |
+| dsAgent       | varchar(50)  | NO   |     | NULL    |                |
+| splunk        | varchar(50)  | NO   |     | NULL    |                |
+| ragent        | varchar(50)  | NO   |     | NULL    |                |
+| eisuserExpi   | varchar(30)  | NO   |     | NULL    |                |
+| rootExpi      | varchar(30)  | NO   |     | NULL    |                |
+| socvaExpi     | varchar(30)  | NO   |     | NULL    |                |
+| addmitamExpi  | varchar(50)  | NO   |     | NULL    |                |
+| systemTime    | varchar(50)  | NO   |     | NULL    |                |
+| fileSystem    | varchar(20)  | NO   |     | NULL    |                |
+| kernelVersion | varchar(100) | NO   |     | NULL    |                |
+| cpu           | int          | YES  |     | NULL    |                |
+| mem_cp_update | varchar(50)  | YES  |     | NULL    |                |
+| memory        | int          | YES  |     | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+26 rows in set (0.00 sec)
+mysql> select * from EISHome_compliance limit 5;
++----+---------------+------------------------+----------------------------------+-------------+-----+---------+-----------+----------------+------------+-----------+----------+----------+-----------+------------+-----------+--------------+--------------+--------------+--------------+---------------------------------------+------------+------------------------------+------+---------------+--------+
+| id | ip_address    | last_update            | upTime                           | server_role | ram | cpuCore | osVersion | kernelUdate    | aceVersion | mqVersion | firewall | rpmCount | dsAgent   | splunk     | ragent    | eisuserExpi  | rootExpi     | socvaExpi    | addmitamExpi | systemTime                            | fileSystem | kernelVersion                | cpu  | mem_cp_update | memory |
++----+---------------+------------------------+----------------------------------+-------------+-----+---------+-----------+----------------+------------+-----------+----------+----------+-----------+------------+-----------+--------------+--------------+--------------+--------------+---------------------------------------+------------+------------------------------+------+---------------+--------+
+|  1 | 10.177.40.10  | 2025-07-26 12:00:03 PM | 1 week 22 hours 3 minutes        | DR LINUX    |  64 |       4 | 9.6(Plow) | Sat Jun EDT 28 | 12.0.12.10 |  9.4.0.11 | active   |      600 | DSrunning | SPLrunning | undefined |  Oct 04 2025 |  Aug 09 2025 |  Oct 03 2025 |  Aug 09 2025 |  0.000010415 seconds slow of NTP time | OK         | 5.14.0-570.25.1.el9_6.x86_64 |    8 | Jun 18 14:05  |     34 |
+|  2 | 10.177.40.101 | 2025-07-26 11:00:02 AM | 1 week 22 hours 52 minutes       | DR LINUX    |  64 |       4 | 9.6(Plow) | Sat Jun EDT 28 | 12.0.12.10 |  9.4.0.11 | inactive |      608 | DSrunning | SPLrunning | undefined |  never       |  Aug 07 2025 |  Oct 12 2025 |  Sep 05 2025 |  0.000202593 seconds fast of NTP time | OK         | 5.14.0-570.25.1.el9_6.x86_64 |    1 | Jun 18 14:05  |     16 |
+|  3 | 10.177.40.102 | 2025-07-26 01:00:02 PM | 1 week 1 day 49 minutes          | DR LINUX    |  64 |       4 | 9.6(Plow) | Sat Jun EDT 28 | 12.0.12.10 |  9.4.0.11 | active   |      599 | DSrunning | SPLrunning | undefined |  never       |  Aug 07 2025 |  Oct 12 2025 |  Sep 05 2025 |  0.000032123 seconds slow of NTP time | OK         | 5.14.0-570.25.1.el9_6.x86_64 |    2 | Jun 18 14:05  |     17 |
+|  4 | 10.177.40.11  | 2025-07-26 02:00:02 PM | 1 week 1 day 3 minutes           | DR LINUX    |  64 |       4 | 9.6(Plow) | Sat Jun EDT 28 | 12.0.12.10 |  9.4.0.11 | active   |      600 | DSrunning | SPLrunning | undefined |  Oct 12 2025 |  Aug 09 2025 |  Oct 03 2025 |  Aug 09 2025 |  0.000094070 seconds fast of NTP time | OK         | 5.14.0-570.25.1.el9_6.x86_64 |    6 | Jun 18 14:05  |     36 |
+|  5 | 10.177.40.110 | 2025-07-26 01:00:03 PM | 5 weeks 5 days 1 hour 31 minutes | DR LINUX    |  64 |       8 | 9.6(Plow) | Tue Jun EDT 3  | 12.0.12.10 |  9.4.0.11 | active   |      600 | DSrunning | SPLrunning | undefined |  Oct 12 2025 |  Oct 09 2025 |  Sep 25 2025 |  Aug 31 2025 |  0.000087542 seconds fast of NTP time | OK         | 5.14.0-570.21.1.el9_6.x86_64 |    2 | Jun 18 14:05  |     37 |
++----+---------------+------------------------+----------------------------------+-------------+-----+---------+-----------+----------------+------------+-----------+----------+----------+-----------+------------+-----------+--------------+--------------+--------------+--------------+---------------------------------------+------------+------------------------------+------+---------------+--------+
+5 rows in set (0.00 sec)
+
