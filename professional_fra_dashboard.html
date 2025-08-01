@@ -380,21 +380,21 @@
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .stats {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .card {
                 width: 100%;
                 max-width: 300px;
             }
-            
+
             .row {
                 flex-direction: column;
             }
-            
+
             .column {
                 min-width: 100%;
             }
@@ -724,41 +724,41 @@
                     if (data.error) {
                         throw new Error(data.error);
                     }
-                    
+
                     // Update FRA Usage
                     const fraPercentElement = document.getElementById("fraPercent");
                     fraPercentElement.textContent = `${data.fra}%`;
-                    
+
                     // Apply color coding based on FRA percentage
                     fraPercentElement.className = '';
-                    if (data.fra >= 80) {
+                    if (data.fra <= 20) {
                         fraPercentElement.classList.add('fra-danger');
-                    } else if (data.fra >= 70) {
+                    } else if (data.fra <= 25) {
                         fraPercentElement.classList.add('fra-warning');
                     }
-                    
+
                     // Update Active Sessions
                     document.getElementById("activeSessions").textContent = data.active_sessions;
-                    
+
                     // Update Sync Table
                     const syncTable = document.getElementById("syncTable");
                     syncTable.innerHTML = "";
-                    
+
                     if (data.sync_status && data.sync_status.length > 0) {
                         data.sync_status.forEach(row => {
                             const tr = document.createElement("tr");
                             let diffClass = '';
-                            
+
                             // Fixed: Convert diff to string before using replace, handle both string and number cases
                             const diffValue = String(row.diff || '0'); // Convert to string, default to '0' if null/undefined
                             const diff = parseInt(diffValue.replace(/,/g, '')) || 0; // Remove commas and parse, default to 0
-                            
-                            if (diff > 1000) {
+
+                            if (diff > 1) {
                                 diffClass = 'diff-danger';
-                            } else if (diff > 100) {
+                            } else if (diff >0 ) {
                                 diffClass = 'diff-warning';
                             }
-                            
+
                             tr.innerHTML = `
                                 <td>${row.thread || '--'}</td>
                                 <td>${row.received || '--'}</td>
@@ -770,7 +770,7 @@
                     } else {
                         syncTable.innerHTML = "<tr><td colspan='4' class='no-data'>No synchronization data available</td></tr>";
                     }
-                    
+
                     // Update Max Table if applicable
                     if (env === "PR" && db === "ArchivalPR") {
                         document.getElementById("maxTable").style.display = "block";
@@ -803,7 +803,7 @@
                 tables.forEach(id => {
                     document.getElementById(id).innerHTML = "<tr><td colspan='4'><div class='spinner'></div> Loading data...</td></tr>";
                 });
-                
+
                 // Fetch all sync status data
                 fetchAllSyncStatus();
             }
@@ -826,11 +826,11 @@
                         { pr: "archnpr", dr: "archndr", prEnv: "ArchivalPR", drEnv: "ArchivalDR" },
                         { pr: "archpr", dr: "archdr", prEnv: "ArchivalPR", drEnv: "ArchivalDR" }
                     ];
-                    
+
                     pairs.forEach(pair => {
                         const prData = data.find(item => item.env === pair.prEnv);
                         const drData = data.find(item => item.env === pair.drEnv);
-                        
+
                         updateSyncTable(pair.pr, prData ? prData.sync_status : null);
                         updateSyncTable(pair.dr, drData ? drData.sync_status : null);
                     });
