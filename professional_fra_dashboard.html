@@ -2,237 +2,295 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Monitoring Dashboard</title>
+    <title>Database Monitoring Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
-            --dark-bg: #1c1c1c;
-            --light-bg: #f2f2f2;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --text-color: #f0f0f0;
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --accent-color: #66fcf1;
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #00cec9;
+            --text-color: #f5f6fa;
+            --bg-color: #2d3436;
+            --card-bg: #353b48;
+            --table-header: #636e72;
+            --success-color: #00b894;
+            --danger-color: #d63031;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light {
+            --bg-color: #f5f6fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --table-header: #dfe6e9;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(145deg, #0f2027, #203a43, #2c5364);
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         h1 {
             text-align: center;
+            color: var(--primary-color);
             padding: 20px;
-            font-size: 2.2em;
-            color: var(--accent-color);
         }
 
         .container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            padding: 20px;
             max-width: 1200px;
             margin: auto;
-        }
-
-        .section {
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            border-radius: 15px;
             padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        select, input[type="date"] {
+            padding: 10px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-        }
-
-        .section:hover {
-            transform: scale(1.01);
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 5px;
-            color: var(--accent-color);
+            border-radius: 10px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            color: var(--text-color);
-            margin-top: 10px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 10px var(--glass-shadow);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        thead {
+            background-color: var(--table-header);
         }
 
         th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--glass-border);
+            padding: 15px;
             text-align: left;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         th {
-            background-color: var(--dark-bg);
+            color: var(--accent-color);
         }
 
         tr:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .status-tag {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.9em;
+        .status-success {
+            color: var(--success-color);
             font-weight: bold;
-            display: inline-block;
         }
 
-        .status-completed {
-            background-color: #28a745;
-            color: white;
+        .status-danger {
+            color: var(--danger-color);
+            font-weight: bold;
         }
 
-        .status-in-progress {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .status-pending {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        /* Hamburger menu styles */
-        #hamburgerMenu {
+        .toggle-theme {
             position: fixed;
             top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-
-        .menu-icon {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 22px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             z-index: 1001;
         }
 
-        .menu-icon span {
-            height: 4px;
-            background-color: var(--text-color);
-            border-radius: 2px;
-            transition: all 0.3s ease-in-out;
+        /* Hamburger menu styles */
+        .hamburger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 22px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
         }
 
-        #menuToggle {
-            display: none;
+        .hamburger span {
+            background: var(--text-color);
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
 
         .sidebar {
             position: fixed;
             top: 0;
-            left: -250px;
+            left: -260px;
+            width: 250px;
             height: 100%;
-            width: 220px;
-            background-color: var(--dark-bg);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-            padding-top: 60px;
-            transition: left 0.3s ease;
-            z-index: 1000;
+            background: var(--card-bg);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-right: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding-top: 80px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.open {
+            left: 0;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
-        .sidebar ul li {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .sidebar ul li a {
-            text-decoration: none;
-            color: var(--text-color);
+        .sidebar li {
+            padding: 15px 25px;
             font-size: 1rem;
-            transition: color 0.2s;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
 
-        .sidebar ul li a:hover {
-            color: var(--accent-color);
+        .sidebar li:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        #menuToggle:checked ~ .sidebar {
+        .overlay {
+            position: fixed;
+            top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        body.sidebar-open .container {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+
+            body.sidebar-open .container {
+                margin-left: 0;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <!-- Hamburger Menu -->
-    <div id="hamburgerMenu">
-        <input type="checkbox" id="menuToggle">
-        <label for="menuToggle" class="menu-icon">
-            <span></span>
-            <span></span>
-            <span></span>
-        </label>
-        <nav class="sidebar">
-            <ul>
-                <li><a href="#tablespaces">Tablespaces</a></li>
-                <!-- Add more menu items here -->
-            </ul>
-        </nav>
+    <div class="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 
-    <h1>Monitoring Dashboard</h1>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li onclick="navigateTo('tablespaces')">Tablespaces</li>
+        </ul>
+    </div>
 
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Theme Toggle Button -->
+    <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
+
+    <!-- Main Container -->
     <div class="container">
-        <!-- Tablespaces Section -->
-        <div class="section" id="tablespaces">
-            <h2 class="section-title">Tablespaces</h2>
-            <p style="text-align:center; color:var(--text-color); font-weight:300;">
-                Tablespace monitoring details will appear here...
-            </p>
+        <h1>Database Monitoring Dashboard</h1>
+
+        <!-- Controls -->
+        <div class="controls">
+            <select>
+                <option value="5min">Last 5 Minutes</option>
+                <option value="1h">Last Hour</option>
+                <option value="1d">Last Day</option>
+                <option value="custom">Custom</option>
+            </select>
+            <input type="date" />
         </div>
 
-        <!-- Example Section -->
-        <div class="section">
-            <h2 class="section-title">Example Data</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Server</th>
-                        <th>Usage</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Server A</td>
-                        <td>72%</td>
-                        <td><span class="status-tag status-completed">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Server B</td>
-                        <td>55%</td>
-                        <td><span class="status-tag status-in-progress">In Progress</span></td>
-                    </tr>
-                    <tr>
-                        <td>Server C</td>
-                        <td>89%</td>
-                        <td><span class="status-tag status-pending">Pending</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- Example Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Server</th>
+                    <th>Status</th>
+                    <th>CPU Usage</th>
+                    <th>Memory</th>
+                    <th>TD %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>db-server-01</td>
+                    <td class="status-success">Running</td>
+                    <td>45%</td>
+                    <td>7.8 GB</td>
+                    <td>65%</td>
+                </tr>
+                <tr>
+                    <td>db-server-02</td>
+                    <td class="status-danger">Down</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>0%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Additional tables or sections can be added here -->
     </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        function navigateTo(section) {
+            alert("Navigating to: " + section);
+            toggleSidebar();
+        }
+    </script>
 </body>
 </html>
