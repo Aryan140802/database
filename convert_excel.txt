@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Convert Report to Excel</title>
+  <!-- Use local script instead of online CDN -->
+  <script src="xlsx.full.min.js"></script>
+</head>
+<body>
+  <h2>Convert report.txt to Excel</h2>
+  <input type="file" id="fileInput" accept=".txt" />
+  <button onclick="convertToExcel()">Convert & Download Excel</button>
+
+  <script>
+    function convertToExcel() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("Please upload report.txt");
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        const wb = XLSX.utils.book_new();
+
+        const volumeData = extractDateCount(text, "TRUNC(REQUEST_DATE_");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(volumeData), "Volume Trend");
+
+        const netData = extractDateCount(text, "TRUNC(REQ_TIME,'HH'");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(netData), "Net Count");
+
+        const dbSizeData = extractDbSizes(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dbSizeData), "DB Sizes");
+
+        const tsData = extractTablespaces(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tsData), "Tablespaces");
+const diskSpace = extractDiskSpace(text);
+XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(diskSpace), "Disk Space");
+
+
+const rmanData = extractRman(text);
+for (const dbName in rmanData) {
+  const sheet = XLSX.utils.aoa_to_sheet(rmanData[dbName]);
+  XLSX.utils.book_append_sheet(wb, sheet, `RMAN - ${dbName}`);
+}
+
+
+	const mountDataMap = extractMountPoints(text);
+for (const ip in mountDataMap) {
+  const ws = XLSX.utils.aoa_to_sheet(mountDataMap[ip]);
+  XLSX.utils.book_append_sheet(wb, ws, `Mount ${ip}`);
+}
+
+        const archiveThreads = extractArchiveThreads(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(archiveThreads), "Archive Threads");
+
+        const dailyTrend = extractDailyVolumeTrend(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dailyTrend), "Daily Volume Trend");
+
+        XLSX.writeFile(wb, "full_report.xlsx");
+      };
+      reader.readAsText(file);
+    }
+
+
+
+    function extractDateCount(text, keyword) {
+      const lines = text.split("\n");
+      const data = [["DateTime", "Count"]];
+      let collecting = false;
+
+      for (let line of lines) {
+        if (line.includes(keyword)) collecting = true;
+        if (collecting) {
+          const match = line.trim().match(/^(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})\s+([\d,]+)$/);
+          if (match) {
+            data.push([match[1], parseInt(match[2].replace(/,/g, ''))]);
+          } else if (line.includes("Elapsed:")) {
+            break;
+          }
+        }
+      }
+      return data;
+    }
+
+    function extractDbSizes(text) {
+      const data = [["DB", "Metric", "Value"]];
+      const lines = text.split("\n");
+      let currentDb = "";
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        const dbHeaderMatch = line.match(/\*+\s*([A-Z\s]+?)\s+\(.*?\)\s*\*+/i);
+        if (dbHeaderMatch) {
+          currentDb = dbHeaderMatch[1].replace(/\s+/g, "").toUpperCase();
+          continue;
+        }
+
+        if (
+          line === "DB_TOTAL_SIZE" ||
+          line === "DB_ACTUAL_SIZE" ||
+          line === "EISAPP_SCHEMA_SIZE"
+        ) {
+          if (lines[i + 1] && lines[i + 1].trim().match(/^-+$/)) i++;
+          const valueLine = lines[i + 1]?.trim();
+          const value = parseFloat(valueLine) || 0;
+          data.push([currentDb, line, value]);
+          i++;
+        }
+      }
+      return data;
+    }
+
+    function extractTablespaces(text) {
+      const data = [["DB", "Tablespace", "Size (Mb)", "Used (Mb)", "Free (Mb)", "% Used", "% Free", "Message"]];
+      const lines = text.split("\n");
+      let currentDb = "";
+      let capture = false;
+
+      for (let line of lines) {
+        line = line.trim();
+
+        const dbMatch = line.match(/^TABLESPACE\s+([A-Z0-9_]+)$/);
+        if (dbMatch) {
+          currentDb = dbMatch[1];
+          capture = false;
+          continue;
+        }
+
+        if (line.startsWith("Tablespace") && line.includes("Size (Mb)")) {
+          capture = true;
+          continue;
+        }
+
+        if (line.includes("rows selected")) {
+          capture = false;
+          continue;
+        }
+
+        if (capture) {
+          const match = line.match(/^([A-Z0-9_#\$]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*(.*)$/);
+          if (match) {
+            data.push([
+              currentDb,
+              match[1], match[2], match[3], match[4],
+              match[5], match[6], match[7] ? match[7].trim() : ""
+            ]);
+          }
+        }
+      }
+      return data;
+    }
+function extractRman(text) {
+  const lines = text.split("\n");
+  const dbMap = {}; // { DB_NAME: [ [headers], [...rows] ] }
+
+  let currentDb = "";
+  let capturing = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Detect DB block headers like: * * * I I B ( D R ) (10.x.x.x) - B A C K U P * * *
+    const dbMatch = line.match(/\*+\s*([A-Z\s]+?)\s*\(.*?\)-\s*B\s*A\s*C\s*K\s*U\s*P/i);
+    if (dbMatch) {
+      currentDb = dbMatch[1].replace(/\s+/g, "").toUpperCase();
+      if (!dbMap[currentDb]) {
+        dbMap[currentDb] = [["SESSION_KEY", "INPUT_TYPE", "STATUS", "RMAN_BKUP_START_TIME", "RMAN_BKUP_END_TIME", "HOURS", "SIZE(GB)"]];
+      }
+      capturing = false;
+      continue;
+    }
+
+    // Detect header line and enable capturing
+    if (line.includes("SESSION_KEY") && line.includes("INPUT_TYPE")) {
+      capturing = true;
+      continue;
+    }
+
+    // Capture actual RMAN data lines
+    if (capturing) {
+      const match = line.match(/^(\d+)\s+(\w+)\s+(\w+)\s+(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})\s+(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})\s+([\d.]+)\s+([\d.]+)/);
+      if (match) {
+        dbMap[currentDb].push([
+          match[1], match[2], match[3], match[4], match[5], match[6], match[7]
+        ]);
+      } else if (line === "" || line.includes("rows selected")) {
+        capturing = false;
+      }
+    }
+  }
+
+  return dbMap;
+}
+
+
+    function extractArchiveThreads(text) {
+      const data = [["DB", "DAY", "THREAD#", "GB", "ARCHIVES_GENERATED", "MIN(SEQUENCE#)", "MAX(SEQUENCE#)"]];
+      const lines = text.split("\n");
+      let currentDb = "";
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        const dbMatch = line.match(/\*\s*\*+\s*([A-Z\s]+?)\s*\(.*?\)/i);
+        if (dbMatch) {
+          currentDb = dbMatch[1].replace(/\s+/g, "").toUpperCase();
+          continue;
+        }
+
+        const match = line.match(/^(\d{2}-[A-Z]{3}-\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+        if (match) {
+          data.push([
+            currentDb,
+            match[1], match[2], match[3], match[4], match[5], match[6]
+          ]);
+        }
+      }
+
+      return data;
+    }
+
+    function extractDailyVolumeTrend(text) {
+      const data = [["DB", "DAY", "COUNT#", "MIN#", "MAX#", "MIN(SEQUENCE#)", "MAX(SEQUENCE#)", "DAILY_AVG_MB"]];
+      const lines = text.split("\n");
+      let currentDb = "";
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        const dbMatch = line.match(/\*\s*\*+\s*([A-Z\s]+?)\s*\(.*?\)/i);
+        if (dbMatch) {
+          currentDb = dbMatch[1].replace(/\s+/g, "").toUpperCase();
+          continue;
+        }
+
+        const match = line.match(/^(\d{4}-\d{2}-\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+        if (match) {
+          data.push([
+            currentDb,
+            match[1], match[2], match[3], match[4],
+            match[5], match[6], match[7]
+          ]);
+        }
+      }
+
+      return data;
+    }
+
+function extractDiskSpace(text) {
+  const data = [["NAME", "STATE", "TOTAL_MB/1024", "FREE_MB/1024", "USABLE(GB)"]];
+  const lines = text.split("\n");
+
+  let capture = false;
+
+  for (let line of lines) {
+    line = line.trim();
+
+    // Detect start of section
+    if (line.includes("NAME") && line.includes("STATE")) {
+      capture = true;
+      continue;
+    }
+
+    // Skip dashed lines
+    if (line.match(/^[- ]+$/)) continue;
+
+    // Stop when empty or section ends
+    if (line === "" || line.includes("rows selected")) {
+      capture = false;
+      continue;
+    }
+
+    if (capture) {
+      const match = line.match(/^([A-Z0-9_]+)\s+(\w+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+      if (match) {
+        data.push([match[1], match[2], match[3], match[4], match[5]]);
+      }
+    }
+  }
+
+  return data;
+}
+
+function extractMountPoints(text) {
+  const lines = text.split("\n");
+
+  const ipBlockRegex = /\*+\s*(\d{1,3}(?:\.\d{1,3}){3}(?:\/\d{1,3})*)\s*\*+/;
+  const headerRegex = /^Filesystem\s+Size\s+Used\s+Avail\s+Use%\s+Mounted on$/i;
+  const fsLineRegex = /^\/\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+.+$/;
+
+  const result = {};
+  let currentIPs = [];
+  let headers = [];
+  let rows = [];
+  let reading = false;
+
+  for (let line of lines) {
+    line = line.trim();
+
+    // Match IP block
+    const ipMatch = line.match(ipBlockRegex);
+    if (ipMatch) {
+      // Save previous block for all IPs
+      if (currentIPs.length && rows.length > 0) {
+        currentIPs.forEach(ip => {
+          result[ip] = [headers, ...rows];
+        });
+      }
+
+      // Extract individual IPs (split if /102/103 format)
+      const raw = ipMatch[1]; // e.g. "10.176.0.101/102/103/104"
+      const base = raw.match(/^(\d+\.\d+\.\d+)\.(\d{1,3})/);
+      if (base) {
+        const prefix = base[1]; // 10.176.0
+        const suffixes = raw.split("/").map(s => s.trim());
+        currentIPs = suffixes.map(s => (s.includes(".") ? s : `${prefix}.${s}`));
+      } else {
+        currentIPs = [raw];
+      }
+
+      headers = [];
+      rows = [];
+      reading = false;
+    } else if (headerRegex.test(line)) {
+      headers = ["Filesystem", "Size", "Used", "Avail", "Use%", "Mounted on"];
+      reading = true;
+    } else if (reading && fsLineRegex.test(line)) {
+      const parts = line.split(/\s+/);
+      if (parts.length >= 6) {
+        rows.push(parts.slice(0, 6));
+      }
+    } else if (reading && line === "") {
+      reading = false;
+    }
+  }
+
+  // Add last block
+  if (currentIPs.length && rows.length > 0) {
+    currentIPs.forEach(ip => {
+      result[ip] = [headers, ...rows];
+    });
+  }
+
+  return result;
+}
+
+
+  </script>
+</body>
+</html>
