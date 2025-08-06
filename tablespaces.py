@@ -1,15 +1,4 @@
-SELECT JSON_ARRAYAGG(
-         JSON_OBJECT(
-           'tablespace' VALUE tspace,
-           'tot_ts_size' VALUE tot_ts_size,
-           'used_ts_size' VALUE used_ts_size,
-           'free_ts_size' VALUE free_ts_size,
-           'used_pct' VALUE used_pct,
-           'free_pct' VALUE free_pct,
-           'warning' VALUE warning
-         )
-       ) AS tablespace_usage
-FROM (
+WITH ts_data AS (
   SELECT df.tablespace_name tspace,
          ROUND(SUM(fs.bytes_free + fs.bytes_used) / 1024 / 1024, 2) tot_ts_size,
          ROUND(SUM(fs.bytes_used) / 1024 / 1024, 2) used_ts_size,
@@ -21,7 +10,7 @@ FROM (
   JOIN dba_temp_files df ON fs.tablespace_name = df.tablespace_name AND fs.file_id = df.file_id
   GROUP BY df.tablespace_name
 
-  UNION
+  UNION ALL
 
   SELECT df.tablespace_name tspace,
          df.bytes / (1024 * 1024) tot_ts_size,
@@ -38,7 +27,7 @@ FROM (
   ) df ON fs.tablespace_name = df.tablespace_name
   GROUP BY df.tablespace_name, df.bytes
 
-  UNION
+  UNION ALL
 
   SELECT tablespace_name tspace,
          1 tot_ts_size,
@@ -60,4 +49,15 @@ FROM (
   FROM dba_free_space
   GROUP BY tablespace_name
 )
-ORDER BY free_ts_size;
+SELECT JSON_ARRAYAGG(
+         JSON_OBJECT(
+           'tablespace' VALUE tspace,
+           'tot_ts_size' VALUE tot_ts_size,
+           'used_ts_size' VALUE used_ts_size,
+           'free_ts_size' VALUE free_ts_size,
+           'used_pct' VALUE used_pct,
+           'free_pct' VALUE free_pct,
+           'warning' VALUE warning
+         )
+       ) AS tablespace_usage
+FROM ts_data;
