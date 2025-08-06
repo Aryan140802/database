@@ -1,3 +1,4 @@
+TABLESPACE_QUERY = """
 WITH ts_data AS (
   SELECT df.tablespace_name tspace,
          ROUND(SUM(fs.bytes_free + fs.bytes_used) / 1024 / 1024, 2) tot_ts_size,
@@ -60,4 +61,5 @@ SELECT JSON_ARRAYAGG(
            'warning' VALUE warning
          )
        ) AS tablespace_usage
-FROM ts_data;
+FROM ts_data
+"""
