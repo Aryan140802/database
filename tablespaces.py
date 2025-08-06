@@ -1,79 +1,53 @@
-import oracledb
-import json
-import traceback
 
-# === DB connection details for all 4 databases ===
-DB_CONFIGS = [
-    {
-        "name": "DB1",
-        "user": "user1",
-        "password": "pass1",
-        "dsn": "host1:1521/service1"
-    },
-    {
-        "name": "DB2",
-        "user": "user2",
-        "password": "pass2",
-        "dsn": "host2:1521/service2"
-    },
-    {
-        "name": "DB3",
-        "user": "user3",
-        "password": "pass3",
-        "dsn": "host3:1521/service3"
-    },
-    {
-        "name": "DB4",
-        "user": "user4",
-        "password": "pass4",
-        "dsn": "host4:1521/service4"
-    }
-]
+set lines 500
+set pages 100
+col tspace form a25 Heading "Tablespace"
+col tot_ts_size form 99999999 Heading "Size (Mb)"
+col free_ts_size form 99999999 Heading "Free (Mb)"
+col used_ts_size form 99999999 Heading "Used (Mb)"
+col used_pct form 99999 Heading "% Used"
+col free_pct form 99999 Heading "% Free"
+col warning form a10 Heading "Message"
+break on report
+compute sum label total of tot_ts_size on report
+compute sum label total of used_ts_size on report
+compute sum label total of free_ts_size on report
+         (select  df.tablespace_name tspace
+   ,       round(sum(fs.bytes_free + fs.bytes_used) / 1024 / 1024, 2) tot_ts_size
+   ,       round(sum(fs.Bytes_used) / 1024 / 1024, 2)  used_ts_size
+   ,       round(sum(fs.bytes_free) / 1024 / 1024, 2)  free_ts_size
+   ,       round(sum(fs.Bytes_used ) * 100 / sum((fs.bytes_free + fs.bytes_used))) used_pct
+   ,       round(sum(fs.Bytes_free ) * 100 / sum((fs.bytes_free + fs.bytes_used))) free_pct
+   ,      decode(sign(sum(round(((fs.bytes_free + fs.bytes_used)-fs.bytes_free)*100/(fs.bytes_free + fs.bytes_used))) - 80), 1, '
+   !ALERT', '') warning
+   from   SYS.V_$TEMP_SPACE_HEADER fs
+   ,      dba_temp_files df
+   where fs.tablespace_name(+) = df.tablespace_name
+     and fs.file_id(+) = df.file_id
+     group by df.tablespace_name
+     union
+     SELECT df.tablespace_name tspace
+     ,      df.bytes/(1024*1024) tot_ts_size
+     ,      round((df.bytes-sum(fs.bytes))/(1024*1024)) used_ts_size
+     ,      sum(fs.bytes)/(1024*1024) free_ts_size
+     ,      round((df.bytes-sum(fs.bytes))*100/df.bytes) used_pct
+     ,      round(sum(fs.bytes)*100/df.bytes) free_pct
+     ,      decode(sign(round((df.bytes-sum(fs.bytes))*100/df.bytes) - 80), 1, '!ALERT', '') warning
+     FROM dba_free_space fs
+     , (select tablespace_name, sum(bytes) bytes
+        from dba_data_files
+           group by tablespace_name
+              ) df
+              WHERE fs.tablespace_name(+) = df.tablespace_name
+              GROUP BY df.tablespace_name, df.bytes)
+              union
+              (select tablespace_name tspace,
+              1,1,0 free_ts_size,100 used_pct,0 free_pct,'!' warning from dba_data_files
+              group by tablespace_name
+              minus
+              select tablespace_name tspace,1,1,0 free_ts_size,100 used_pct,0 free_pct,'!' warning
+              from dba_free_space
+              group by tablespace_name)
+              order by 4
+              ;
 
-# === Query to run on each DB ===
-QUERY = "SELECT * FROM your_table FETCH FIRST 10 ROWS ONLY"
-
-def fetch_data_from_db(config):
-    try:
-        connection = oracledb.connect(
-            user=config["user"],
-            password=config["password"],
-            dsn=config["dsn"]
-        )
-        cursor = connection.cursor()
-        cursor.execute(QUERY)
-
-        columns = [col[0] for col in cursor.description]
-        rows = cursor.fetchall()
-
-        # Format result as list of dicts
-        results = [dict(zip(columns, row)) for row in rows]
-
-        cursor.close()
-        connection.close()
-
-        return {
-            "database": config["name"],
-            "status": "success",
-            "rows": results
-        }
-
-    except Exception as e:
-        return {
-            "database": config["name"],
-            "status": "error",
-            "error": str(e),
-            "trace": traceback.format_exc()
-        }
-
-def main():
-    all_results = []
-
-    for config in DB_CONFIGS:
-        result = fetch_data_from_db(config)
-        all_results.append(result)
-
-    print(json.dumps(all_results, indent=4, default=str))
-
-if __name__ == "__main__":
-    main()
