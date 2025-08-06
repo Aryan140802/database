@@ -5,11 +5,11 @@ import traceback
 # === DB connection details for all 4 databases ===
 DB_CONFIG = {
     "PR": {
-        "MIPR": {"dsn": "10.191.170.107:1787/MIIBPRDB_SRV", "user": "sys"},
-        "SIPR": {"dsn": "10.191.170.109:1787/sbisipr", "user": "sys"},
-        "RepoPR": {"dsn": "10.191.170.110:1787/REPODB_SRV", "user": "sys"},
-        "ArchivalPR": {"dsn": "10.191.170.111:1787/ARCHNPR_SRV", "user": "sys"},
-        "HIDR": {"dsn": "10.191.170.107:1787/hiibprdb", "user": "sys"}
+        "MIPR": {"dsn": "10.191.170.107:1787/MIIBPRDB_SRV", "user": "sys", "password": "your_password"},
+        "SIPR": {"dsn": "10.191.170.109:1787/sbisipr", "user": "sys", "password": "your_password"},
+        "RepoPR": {"dsn": "10.191.170.110:1787/REPODB_SRV", "user": "sys", "password": "your_password"},
+        "ArchivalPR": {"dsn": "10.191.170.111:1787/ARCHNPR_SRV", "user": "sys", "password": "your_password"},
+        "HIDR": {"dsn": "10.191.170.107:1787/hiibprdb", "user": "sys", "password": "your_password"}
     }
 }
 
@@ -79,26 +79,14 @@ SELECT JSON_ARRAYAGG(
        ) AS tablespace_usage
 FROM ts_data
 """
-all_results={}
 
-def fetch_tablespace_data(config):
-        env = request.GET.get("env")
-    db = request.GET.get("db")
-    if env not in DB_CONFIG or db not in DB_CONFIG[env]:
-        return JsonResponse({"error": "Invalid environment or database name."}, status=400)
-
-    config = DB_CONFIG[env][db]
-    key = f"{env}.{db}"
-
-    if key not in PASSWORDS:
-        return JsonResponse({"error": f"Password not found for {key}."}, status=500)
-
-
+def fetch_tablespace_data(env, dbname, config):
     try:
         connection = oracledb.connect(
             user=config["user"],
             password=config["password"],
-            dsn=config["dsn"]
+            dsn=config["dsn"],
+            mode=oracledb.SYSDBA  # since you're connecting as SYS
         )
         cursor = connection.cursor()
         cursor.execute(TABLESPACE_QUERY)
@@ -106,27 +94,33 @@ def fetch_tablespace_data(config):
         connection.close()
 
         return {
-            "database": config["name"],
+            "database": f"{env}.{dbname}",
             "status": "success",
             "data": json.loads(result[0]) if result and result[0] else []
         }
 
     except Exception as e:
         return {
-            "database": config["name"],
+            "database": f"{env}.{dbname}",
             "status": "error",
             "error": str(e),
             "trace": traceback.format_exc()
         }
 
 def main():
-    final_output = []
-    for config in DB_CONFIG:
-        print(f"Fetching from {config['name']}...")
-        result = fetch_tablespace_data(config)
-        final_output.append(result)
+    all_results = []
 
-    print(json.dumps(final_output, indent=4))
+    for env in DB_CONFIG:
+        for dbname, config in DB_CONFIG[env].items():
+            print(f"Fetching tablespace data from {env}.{dbname}...")
+            result = fetch_tablespace_data(env, dbname, config)
+            all_results.append(result)
+
+    # Save to file
+    with open("tbs_output.json", "w") as outfile:
+        json.dump(all_results, outfile, indent=4)
+
+    print("✅ Data saved to tbs_output.json")
 
 if __name__ == "__main__":
     main()
