@@ -1,0 +1,46 @@
+from django.http import FileResponse, Http404
+import os
+
+def download_report(request):
+    file_path = "/opt/reports/report.txt"  # Adjust path as needed
+
+    if os.path.exists(file_path):
+        return FileResponse(open(file_path, 'rb'), content_type='text/plain')
+    else:
+        raise Http404("Report not found.")
+
+
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('get-report/', views.download_report, name='get_report'),
+]
+
+
+
+
+
+
+<button onclick="fetchAndConvert()">Fetch & Convert Report</button>
+
+<script>
+  function fetchAndConvert() {
+    fetch('/get-report/')
+      .then(response => response.text())
+      .then(text => {
+        const wb = XLSX.utils.book_new();
+
+        // Use your existing parsing functions here
+        const volumeData = extractDateCount(text, "TRUNC(REQUEST_DATE_");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(volumeData), "Volume Trend");
+
+        // Add your other sheets
+        // ...
+
+        XLSX.writeFile(wb, "full_report.xlsx");
+      })
+      .catch(error => alert("Failed to fetch report: " + error));
+  }
+</script>
