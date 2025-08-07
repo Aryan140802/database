@@ -14,25 +14,25 @@
         :root {
             --primary-color: #4a6fa5;
             --secondary-color: #7b9ed9;
-            --glass-color: rgba(255, 255, 255, 0.25);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            --text-color: #333;
+            --glass-color: rgba(255, 255, 255, 0.9);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.9);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --text-color: #2d3748;
             --text-light: #f8f9fa;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+            --warning-color: #dd6b20;
+            --info-color: #3182ce;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
             margin: 0;
             padding: 0;
-            background-attachment: fixed;
+            line-height: 1.5;
         }
         
         .top_container {
@@ -42,15 +42,13 @@
             color: var(--text-light);
             text-align: center;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            border-radius: 0 0 15px 15px;
-            box-shadow: var(--glass-shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
             align-items: center;
             font-size: 1.5rem;
             position: relative;
             z-index: 10;
+            border-radius: 0 0 12px 12px;
         }
         
         .top_container a {
@@ -58,36 +56,37 @@
             margin-right: 0px;
             margin-left: auto;
             text-decoration: none;
-            padding: 8px 15px;
+            padding: 8px 16px;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
         
         .top_container a:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .top_container a::before {
             content: "↓";
-            margin-right: 5px;
+            margin-right: 6px;
         }
         
         marquee {
             background: var(--glass-color);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: var(--glass-border);
-            border-radius: 10px;
-            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 12px 20px;
             margin: 20px auto;
             width: 90%;
             box-shadow: var(--glass-shadow);
             color: var(--text-color);
             font-weight: 500;
+            font-size: 1.05rem;
         }
         
         .middle_container {
@@ -96,16 +95,13 @@
             max-width: 1400px;
         }
         
-        .box {
+        #data {
             background: var(--glass-color);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: var(--glass-border);
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            padding: 0;
             box-shadow: var(--glass-shadow);
-            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0;
         }
         
         table {
@@ -122,22 +118,28 @@
         th {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
             color: var(--text-light) !important;
-            padding: 12px 8px !important;
+            padding: 14px 10px !important;
             font-weight: 600 !important;
             position: sticky;
             top: 0;
             z-index: 10;
+            border: none !important;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         td {
-            background: rgba(255, 255, 255, 0.7) !important;
-            padding: 10px 8px !important;
-            font-size: 13px !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            padding: 12px 10px !important;
+            font-size: 0.85rem !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+            color: var(--text-color);
+            vertical-align: middle;
         }
         
         tr:hover td {
-            background: rgba(255, 255, 255, 0.9) !important;
+            background: rgba(245, 245, 245, 0.98) !important;
         }
         
         .avail {
@@ -149,33 +151,43 @@
         }
         
         .glyphicon {
-            font-size: 20px !important;
+            font-size: 18px !important;
             vertical-align: middle;
         }
         
         #myTable_wrapper {
             width: 100%;
             background: transparent;
+            padding: 20px;
         }
         
         .dataTables_length {
-            margin-top: 20px;
+            margin-top: 10px;
             margin-bottom: 15px;
+            font-size: 0.9rem;
         }
         
         div.dt-buttons {
             position: relative;
             float: left;
             margin-left: 15px;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: 500;
+            margin-top: 10px;
             margin-bottom: 15px;
         }
         
         .dataTables_filter {
-            margin-top: 15px;
+            margin-top: 10px;
             margin-bottom: 15px;
+        }
+        
+        .dataTables_filter label {
+            font-size: 0.9rem;
+        }
+        
+        .dataTables_filter input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
         }
         
         .buttons-html5 {
@@ -185,20 +197,24 @@
             border-radius: 6px !important;
             padding: 6px 12px !important;
             margin-right: 5px !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
         }
         
         .buttons-html5:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+            opacity: 0.9;
         }
         
         select {
-            background: rgba(255, 255, 255, 0.7) !important;
+            background: rgba(255, 255, 255, 0.9) !important;
             border: 1px solid rgba(0, 0, 0, 0.1) !important;
             border-radius: 6px !important;
-            padding: 5px !important;
+            padding: 6px !important;
             margin: 5px 0 !important;
+            font-size: 0.85rem;
         }
         
         tfoot {
@@ -208,17 +224,20 @@
         
         tfoot select {
             width: 100%;
-            background: rgba(255, 255, 255, 0.9) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
         }
         
         .dataTables_info {
             color: var(--text-color) !important;
+            font-size: 0.9rem;
         }
         
         .paginate_button {
             border-radius: 6px !important;
             margin: 0 2px !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.9rem !important;
+            padding: 6px 12px !important;
         }
         
         .paginate_button.current {
@@ -247,70 +266,81 @@
             background: rgba(0, 0, 0, 0.3);
         }
         
-        /* Floating animation for header */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
+        /* Status indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
         }
         
-        .top_container {
-            animation: float 6s ease-in-out infinite;
+        .status-active {
+            background-color: var(--success-color);
         }
         
-        /* Modern tooltip for status icons */
-        [data-toggle="tooltip"] {
-            cursor: pointer;
-            position: relative;
+        .status-inactive {
+            background-color: var(--danger-color);
         }
         
-        [data-toggle="tooltip"]::after {
-            content: attr(data-title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-        
-        [data-toggle="tooltip"]:hover::after {
-            opacity: 1;
-            visibility: visible;
-            bottom: calc(100% + 5px);
+        .status-warning {
+            background-color: var(--warning-color);
         }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .top_container {
                 font-size: 1.2rem;
-                padding: 15px;
+                padding: 16px;
+            }
+            
+            .top_container a {
+                padding: 6px 12px;
+                font-size: 0.8rem;
             }
             
             marquee {
-                font-size: 120%;
-                padding: 8px;
+                font-size: 0.95rem;
+                padding: 10px 15px;
             }
             
             th, td {
-                padding: 8px 5px !important;
-                font-size: 12px !important;
+                padding: 10px 6px !important;
+                font-size: 0.8rem !important;
             }
+            
+            #myTable_wrapper {
+                padding: 10px;
+            }
+        }
+        
+        /* Animation for status changes */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .status-change {
+            animation: pulse 0.5s ease;
+        }
+        
+        /* Zebra striping for better readability */
+        tr:nth-child(even) td {
+            background: rgba(250, 250, 250, 0.95) !important;
+        }
+        
+        /* Focus state for better accessibility */
+        a:focus, button:focus, select:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
     </style>
 </head>
 
 <body>
     <div class="container top_container">
-        PROD Compliance Monitoring Dashboard
+        <span style="flex-grow: 1; text-align: center;">PROD Compliance Monitoring Dashboard</span>
         <a href="data/service_status.csv">Download CSV</a>
     </div>
 
@@ -320,7 +350,7 @@
 
     <div class="container-fluid middle_container">
         <div class="row">
-            <div class="col-sm-12 box" id="data">
+            <div class="col-sm-12" id="data">
                 <!-- Table will be inserted here by JavaScript -->
             </div>
         </div>
@@ -395,7 +425,7 @@
                         for (let j = 0; j <=col_length ;j++ ) {
                             const td_service = document.createElement("td");
                             td_service.setAttribute("id",col[j]);
-                            
+                
                             if( col[j] == "DSrunning" ) {
                                 span_element = document.createElement("span");
                                 span_element.classList.add("glyphicon");
@@ -484,13 +514,15 @@
                                     td_service.innerHTML=col[j];
                                     
                                     if ( diff <=5 ) {
-                                        td_service.style.backgroundColor="rgba(220, 53, 69, 0.2)";
+                                        td_service.style.backgroundColor="rgba(229, 62, 62, 0.1)";
+                                        td_service.style.fontWeight="500";
                                     }
                                     else if ( diff >=6 && diff <=10 ) {
-                                        td_service.style.backgroundColor="rgba(255, 193, 7, 0.2)";
+                                        td_service.style.backgroundColor="rgba(221, 107, 32, 0.1)";
+                                        td_service.style.fontWeight="500";
                                     }
                                     else if ( diff <=11 && diff <=15) {
-                                        td_service.style.backgroundColor="rgba(40, 167, 69, 0.2)";
+                                        td_service.style.backgroundColor="rgba(56, 161, 105, 0.1)";
                                     }
                                 }
                                 else {
@@ -547,7 +579,7 @@
         });
 
         function initializeDataTable() {
-            console.log( "appling data table filter ...." );
+            console.log( "applying data table filter ...." );
             var table = $('#myTable').DataTable({
                 "processing": true,
                 "pageLength": 10,
@@ -563,7 +595,14 @@
                             'csv',
                         ]
                     }
-                ]
+                ],
+                "initComplete": function() {
+                    // Add subtle animation to table when loaded
+                    $('#myTable').addClass('status-change');
+                    setTimeout(function() {
+                        $('#myTable').removeClass('status-change');
+                    }, 500);
+                }
             });
 
             $("#myTable tfoot th").each( function ( i ) {
