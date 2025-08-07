@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Convert Report to Excel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <h2>Convert report.txt to Excel</h2>
+  <input type="file" id="fileInput" accept=".txt" />
+  <button onclick="convertToExcel()">Convert & Download Excel</button>
+
+  <script>
+    function convertToExcel() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("Please upload report.txt");
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        const wb = XLSX.utils.book_new();
+
+        // Volume Trend
+        const volumeData = extractDateCount(text, "TRUNC(REQUEST_DATE_");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(volumeData), "Volume Trend");
+
+        // Net Count
+        const netData = extractDateCount(text, "TRUNC(REQ_TIME,'HH'");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(netData), "Net Count");
+
+        // DB Sizes
+        const dbSizeData = extractDbSizes(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dbSizeData), "DB Sizes");
+
+        // Tablespaces
+        const tsData = extractTablespaces(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tsData), "Tablespaces");
+
+        // RMAN Backup
+        const rmanData = extractRman(text);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rmanData), "RMAN Backup");
+	
+	const archiveThreads = extractArchiveThreads(text);
+	const dailyTrend = extractDailyVolumeTrend(text);
+
+	XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(archiveThreads), "Archive Threads");
+	XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dailyTrend), "Daily Volume Trend");
+
+
+        XLSX.writeFile(wb, "full_report.xlsx");
+      };
+      reader.readAsText(file);
+    }
+
+    function extractDateCount(text, keyword) {
+      const lines = text.split("\n");
+      const data = [["DateTime", "Count"]];
+      let collecting = false;
+
+      for (let line of lines) {
+        if (line.includes(keyword)) collecting = true;
+        if (collecting) {
+          const match = line.trim().match(/^(\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2})\s+([\d,]+)$/);
+          if (match) {
+            data.push([match[1], parseInt(match[2].replace(/,/g, ''))]);
+          } else if (line.includes("Elapsed:")) {
+            break;
+          }
+        }
+      }
+      return data;
+    }
+
+   function extractDbSizes(text) {
+  const data = [["DB", "Metric", "Value"]];
+  const lines = text.split("\n");
+
+  let currentDb = "";
+  const dbNames = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Match DB block headers like: "* * * I  I  B  (10.191...) * * *"
+    const dbHeaderMatch = line.match(/\*+\s*([A-Z\s]+?)\s+\(.*?\)\s*\*+/i);
+    if (dbHeaderMatch) {
+      currentDb = dbHeaderMatch[1].replace(/\s+/g, "").toUpperCase(); // normalize
+      continue;
+    }
+
+    // Match lines like: DB_TOTAL_SIZE, DB_ACTUAL_SIZE, etc.
+    if (
+      line === "DB_TOTAL_SIZE" ||
+      line === "DB_ACTUAL_SIZE" ||
+      line === "EISAPP_SCHEMA_SIZE"
+    ) {
+      const metric = line;
+
+      // Skip dashed line
+      if (lines[i + 1] && lines[i + 1].trim().match(/^-+$/)) {
+        i++; // skip dashed line
+      }
+
+      // Get value line
+      const valueLine = lines[i + 1]?.trim();
+      const value = parseFloat(valueLine) || 0;
+
+      data.push([currentDb, metric, value]);
+      i++; // skip value line too
+    }
+  }
+
+  return data;
+}
+
+
+
+   function extractTablespaces(text) {
+  const data = [["DB", "Tablespace", "Size (Mb)", "Used (Mb)", "Free (Mb)", "% Used", "% Free", "Message"]];
+  const lines = text.split("\n");
+
+  let currentDb = "";
+  let capture = false;
+
+  for (let line of lines) {
+    line = line.trim();
+
+    // Detect start of a new DB block
+    const dbMatch = line.match(/^TABLESPACE\s+([A-Z0-9_]+)$/);
+    if (dbMatch) {
+      currentDb = dbMatch[1];
+      capture = false;
+      continue;
+    }
+
+    // Detect header line and begin capturing
+    if (line.startsWith("Tablespace") && line.includes("Size (Mb)")) {
+      capture = true;
+      continue;
+    }
+
+    // End of a tablespace block
+    if (line.includes("rows selected")) {
+      capture = false;
+      continue;
+    }
+
+    if (capture) {
+      // Match each tablespace row
+      const match = line.match(/^([A-Z0-9_#\$]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*(.*)$/);
+      if (match) {
+        data.push([
+          currentDb,
+          match[1], match[2], match[3], match[4],
+          match[5], match[6], match[7] ? match[7].trim() : ""
+        ]);
+      }
+    }
+  }
+
+  return data;
+}
+
+
+    function extractRman(text) {
+      const data = [["SESSION_KEY", "INPUT_TYPE", "STATUS", "START_TIME", "END_TIME", "HOURS", "SIZE(GB)"]];
+      const lines = text.split("\n");
+      let capture = false;
+
+      for (let line of lines) {
+        if (line.includes("SESSION_KEY INPUT_TYPE")) {
+          capture = true;
+          continue;
+        }
+        if (capture) {
+          const match = line.match(/^\s*(\d+)\s+(\w+)\s+(\w+)\s+([\d-]+ [\d:]+)\s+([\d-]+ [\d:]+)\s+([\d.]+)\s+([\d.]+)/);
+          if (match) {
+            data.push([
+              match[1], match[2], match[3], match[4],
+              match[5], match[6], match[7]
+            ]);
+          } else if (line.trim() === "") {
+            break;
+          }
+        }
+      }
+      return data;
+    }
+
+function extractArchiveThreads(text) {
+  const data = [["DB", "DAY", "THREAD#", "GB", "ARCHIVES_GENERATED", "MIN(SEQUENCE#)", "MAX(SEQUENCE#)"]];
+  const lines = text.split("\n");
+
+  let currentDb = "";
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Detect DB block headers
+    const dbMatch = line.match(/\*\s*\*+\s*([A-Z\s]+?)\s*\(.*?\)/i);
+    if (dbMatch) {
+      currentDb = dbMatch[1].replace(/\s+/g, "").toUpperCase();
+      continue;
+    }
+
+    // Match data lines for thread-wise archive logs
+    const match = line.match(/^(\d{2}-[A-Z]{3}-\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+    if (match) {
+      data.push([
+        currentDb,
+        match[1], match[2], match[3], match[4], match[5], match[6]
+      ]);
+    }
+  }
+
+  return data;
+}
+
+function extractDailyVolumeTrend(text) {
+  const data = [["DB", "DAY", "COUNT#", "MIN#", "MAX#", "MIN(SEQUENCE#)", "MAX(SEQUENCE#)", "DAILY_AVG_MB"]];
+  const lines = text.split("\n");
+
+  let currentDb = "";
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Detect DB block headers
+    const dbMatch = line.match(/\*\s*\*+\s*([A-Z\s]+?)\s*\(.*?\)/i);
+    if (dbMatch) {
+      currentDb = dbMatch[1].replace(/\s+/g, "").toUpperCase();
+      continue;
+    }
+
+    // Match daily trend row: DATE + 6 numbers
+    const match = line.match(/^(\d{4}-\d{2}-\d{2})\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+    if (match) {
+      data.push([
+        currentDb,
+        match[1], match[2], match[3], match[4],
+        match[5], match[6], match[7]
+      ]);
+    }
+  }
+
+  return data;
+}
+
+  </script>
+</body>
+</html>
