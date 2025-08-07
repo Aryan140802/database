@@ -1,0 +1,12 @@
+      function downloadFile(){
+        const fileUrl='/var/www/cgi-bin/database/databaseOps/db_script/';
+        const fileName = 'Report.txt';
+        console.log(fileUrl);
+        console.log("here");
+        const link=document.createElement('a');
+        link.href=fileUrl;
+        link.download=fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
