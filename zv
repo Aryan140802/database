@@ -1,0 +1,16 @@
+#!/bin/bash
+echo "Content-Type: application/octet-stream"
+echo "Content-Disposition: attachment; filename=Database_Report.txt"
+echo ""
+cat /var/www/cgi-bin/database/databaseOps/db_script/Report.txt
+
+
+
+
+chmod +x /var/www/cgi-bin/download_report.cgi
+
+
+
+function downloadReport() {
+    window.location.href = '/cgi-bin/download_report.cgi';
+}
