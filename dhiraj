@@ -1,614 +1,591 @@
 <html>
+<head>
+    <title>Compliance Monitoring</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
+    <script type="text/javascript" src="script/script.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #7b9ed9;
+            --glass-color: rgba(255, 255, 255, 0.25);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --text-color: #333;
+            --text-light: #f8f9fa;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-attachment: fixed;
+        }
+        
+        .top_container {
+            display: flex;
+            padding: 20px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+            align-items: center;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .top_container a {
+            color: var(--text-light);
+            margin-right: 0px;
+            margin-left: auto;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .top_container a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .top_container a::before {
+            content: "↓";
+            margin-right: 5px;
+        }
+        
+        marquee {
+            background: var(--glass-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 20px auto;
+            width: 90%;
+            box-shadow: var(--glass-shadow);
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .middle_container {
+            margin: 2% auto;
+            width: 95%;
+            max-width: 1400px;
+        }
+        
+        .box {
+            background: var(--glass-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 0;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: transparent;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: var(--text-light) !important;
+            padding: 12px 8px !important;
+            font-weight: 600 !important;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            background: rgba(255, 255, 255, 0.7) !important;
+            padding: 10px 8px !important;
+            font-size: 13px !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+        
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .avail {
+            color: var(--success-color) !important;
+        }
+        
+        .not-avail {
+            color: var(--danger-color) !important;
+        }
+        
+        .glyphicon {
+            font-size: 20px !important;
+            vertical-align: middle;
+        }
+        
+        #myTable_wrapper {
+            width: 100%;
+            background: transparent;
+        }
+        
+        .dataTables_length {
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        
+        div.dt-buttons {
+            position: relative;
+            float: left;
+            margin-left: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .dataTables_filter {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .buttons-html5 {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            margin-right: 5px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .buttons-html5:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        select {
+            background: rgba(255, 255, 255, 0.7) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-radius: 6px !important;
+            padding: 5px !important;
+            margin: 5px 0 !important;
+        }
+        
+        tfoot {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: var(--text-light) !important;
+        }
+        
+        tfoot select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .dataTables_info {
+            color: var(--text-color) !important;
+        }
+        
+        .paginate_button {
+            border-radius: 6px !important;
+            margin: 0 2px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .paginate_button.current {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        /* Modern scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Floating animation for header */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .top_container {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Modern tooltip for status icons */
+        [data-toggle="tooltip"] {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        [data-toggle="tooltip"]::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        [data-toggle="tooltip"]:hover::after {
+            opacity: 1;
+            visibility: visible;
+            bottom: calc(100% + 5px);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .top_container {
+                font-size: 1.2rem;
+                padding: 15px;
+            }
+            
+            marquee {
+                font-size: 120%;
+                padding: 8px;
+            }
+            
+            th, td {
+                padding: 8px 5px !important;
+                font-size: 12px !important;
+            }
+        }
+    </style>
+</head>
 
-        <head>
-                <title>
-                        Compliance Monitoring
-                </title>
+<body>
+    <div class="container top_container">
+        PROD Compliance Monitoring Dashboard
+        <a href="data/service_status.csv">Download CSV</a>
+    </div>
 
+    <marquee direction="left">
+        The data on this Portal is updated on an hourly basis. Last refresh: <span id="refreshTime"></span>
+    </marquee>
 
+    <div class="container-fluid middle_container">
+        <div class="row">
+            <div class="col-sm-12 box" id="data">
+                <!-- Table will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
 
-        </head>
-        <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="vendor/datatables/css/jquery.dataTables.css">-->
-
-
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
-
-<script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
-<script type="text/javascript" src="script/script.js"></script>
-
-        <style>
-                .top_container
-                {
-                    display: flex;
-                    padding: 15px 20px;
-                    font-weight: 700;
-                    color: #fff;
-                    text-align: center;
-                    background-color: #0275d8;
-                    #width:100%;
+    <script>
+        // Update refresh time
+        document.getElementById('refreshTime').textContent = new Date().toLocaleString();
+        
+        document.addEventListener("DOMContentLoaded",async ()=> {
+            var uid=localStorage.getItem('uidd')
+            var password=localStorage.getItem('password')
+            try {
+                const response = await fetch('https://10.191.171.12:5443/PyPortal/EISHome/authenticatePortal/',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                    },
+                    body: JSON.stringify({uid,password})
+                });
+                const data = await response.json();
+                if(data.status==302){
+                    console.log("login successfull")
                 }
-                .middle_container
-                {
-                    margin-top:1%;
-                    #border:2px solid #d8d8e5;
-                    #overflow-x:auto;
+                else {
+                    window.location.href='https://10.191.171.12:5443/PyPortal/'
                 }
-                .box
-                {
-                        #border:2px solid #f0f0ff;
-                        border:4px solid #f0f0ff;
-                        background:#ffffff;
-                        //text-align:center;
-                        overflow:hidden;
-                        padding:0;
+            }
+            catch(e) {
+                console.log("an error occured for login"+e)
+            }
+        });
 
+        function getData() {
+            function createHeader(tr,table,header_list) {
+                const thead = document.createElement("thead");
+                header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                for(var i=0; i <= header_list.length-1;i++) {
+                    const th = document.createElement("th");
+                    th.innerHTML=header_list[i];
+                    th.classList.add("center");
+                    tr.appendChild(th);
                 }
-                body
-                {
-                        background:#f0f0ff;
-                }
-                table
-                {
-                        width:100%;
-                        border:1px solid #f0f0ff;
-                        padding:1%;
-
-                }
-                .center
-                {
-                        text-align:center;
-                }
-                td,th
-                {
-                        background:#ffffff;
-                        text-align:center;
-                        padding:5;
-                        font-size:12px;
-
-                }
-
-                .avail
-                {
-                        color:green;
-
-                }
-                .not-avail
-                {
-                        color:red;
-                }
-                .glyphicon
-                {
-                        font-size:24px;
-                }
-                #myTable_wrapper{
-                        width:100%;
-
-                }
-
-
-
-
-
-
-
-
-                 .dataTables_length {
-                        margin-top:50px;
-                  }
-                  div.dt-buttons {
-                    position: relative;
-                    float: left;
-                    margin-left: 20px;
-                    margin-top:12px;
-                    font-size:16px;
-                    font-weight:bold;
-                    margin-bottom:10px;
-                 }
-                 .dataTables_filter {
-                         margin-top:20px;
-                 }
-                 .buttons-html5{
-                        width:100%;
-                }
-
-
-
-        </style>
-
-        <body>
-                <div class="container top_container">
-                        hello PROD Compliance Monitoring
-                        <a href="data/service_status.csv" style="color:white;margin-right:0px;margin-left:auto;"> Download </a>
-                </div>
-
-                <marquee direction="left" style="margin-top:1%;font-size: 150%;">
-                        The data on this Portal is updated on an hourly basis.
-                </marquee>
-
-
-                <div class="container-fluid middle_container" style="text-align:center;width:95%;">
-                        <div class="row">
-                                <div class="col-sm-1o" id="data">
-                                        <!--<table id="myTable">
-                                        </table> -->
-                                </div>
-
-
-                        </div>
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                <script>
-
-      document.addEventListener("DOMContentLoaded",async ()=> {
-var uid=localStorage.getItem('uidd')
-var password=localStorage.getItem('password')
-  try{
-     const response  = await fetch('https://10.191.171.12:5443/PyPortal/EISHome/authenticatePortal/',{
-     method:'POST',
-     headers:{
-             'Content-Type':'application/json',
-    },
-    body: JSON.stringify({uid,password})
-    });
-    const data = await response.json();
-    if(data.status==302){
-            console.log("login successfull")
-    }
-    else{
-          window.location.href='https://10.191.171.12:5443/PyPortal/'
-    }
-  }
-catch(e){
-console.log("an error occured for login"+e)
-
-}
-});
-
-
-
-
-
-                        function getData()
-                        {
-
-                          function createHeader(tr,table,header_list)
-                          {
-                                const thead = document.createElement("thead");
-
-                                header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
-                                for(var i=0; i <= header_list.length-1;i++)
-                                {
-                                        //console.log(header_list[i]);
-                                        const th = document.createElement("th");
-                                        th.innerHTML=header_list[i];
-                                        th.classList.add("center");
-                                        tr.appendChild(th);
-
+                thead.appendChild(tr);
+                table.appendChild(thead);
+            }
+            
+            var monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    const table = document.createElement("table");
+                    const tbody = document.createElement("tbody");
+                    table.setAttribute("border","1");
+                    table.classList.add("table-responsive");
+                    table.classList.add("table-bordered");
+                    table.classList.add("display");
+                    table.setAttribute("id","myTable");
+                    const tr = document.createElement("tr");
+                    createHeader(tr,table);
+                    const data_div = document.getElementById("data");
+                    row_data=this.responseText.split("\n");
+                    
+                    for (var i = 0; i < row_data.length-1; i++) {
+                        col=row_data[i].split(",");
+                        col_length = col.length-1
+                        const tr1 = document.createElement("tr");
+                        const td_counter = document.createElement("td");
+                        td_counter.innerHTML=i+1;
+                        tr1.appendChild(td_counter);
+                        
+                        for (let j = 0; j <=col_length ;j++ ) {
+                            const td_service = document.createElement("td");
+                            td_service.setAttribute("id",col[j]);
+                            
+                            if( col[j] == "DSrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ok-circle");
+                                span_element.classList.add("avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if( col[j] == "DSnotrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-remove-circle");
+                                span_element.classList.add("not-avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if( col[j] == "SPLrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ok-circle");
+                                span_element.classList.add("avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if( col[j] == "SPLnotrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-remove-circle");
+                                span_element.classList.add("not-avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if( col[j] == "Ragentrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ok-circle");
+                                span_element.classList.add("avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if( col[j] == "Ragentnotrunning" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-remove-circle");
+                                span_element.classList.add("not-avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "active" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ok-circle");
+                                span_element.classList.add("avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "inactive" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-remove-circle");
+                                span_element.classList.add("not-avail");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "DS_someissue" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ban-circle");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "SPL_someissue" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ban-circle");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "undefined" ) {
+                                span_element = document.createElement("span");
+                                span_element.classList.add("glyphicon");
+                                span_element.classList.add("glyphicon-ban-circle");
+                                td_service.appendChild(span_element);
+                            }
+                            else if ( col[j] == "" ) {
+                                td_service.innerHTML="issue";
+                            }
+                            else {
+                                var foundMonths=monthNames.filter(month => col[j].includes(month));
+                                if ( foundMonths.length > 0 && j != 9) {
+                                    console.log("month found in",j);
+                                    const today = new Date();
+                                    const targetDate=new Date(col[j]);
+                                    const diffmili=targetDate-today;
+                                    const diff=Math.round(diffmili/(1000 * 60 * 60 * 24));
+                                    td_service.innerHTML=col[j];
+                                    
+                                    if ( diff <=5 ) {
+                                        td_service.style.backgroundColor="rgba(220, 53, 69, 0.2)";
+                                    }
+                                    else if ( diff >=6 && diff <=10 ) {
+                                        td_service.style.backgroundColor="rgba(255, 193, 7, 0.2)";
+                                    }
+                                    else if ( diff <=11 && diff <=15) {
+                                        td_service.style.backgroundColor="rgba(40, 167, 69, 0.2)";
+                                    }
                                 }
-
-                                thead.appendChild(tr);
-                                table.appendChild(thead);
-
-
-                          }
-                          var monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                          var xhttp = new XMLHttpRequest();
-                          xhttp.onreadystatechange = function()
-                          {
-                                if (this.readyState == 4 && this.status == 200)
-                                {
-                                        const table = document.createElement("table");
-                                        //const table  = document.getElementById("myTable");
-                                        const tbody = document.createElement("tbody");
-                                        table.setAttribute("border","1");
-                                        table.classList.add("table-responsive");
-                                        table.classList.add("table-bordered");
-                                        table.classList.add("display");
-
-                                        table.setAttribute("id","myTable");
-                                        const tr = document.createElement("tr");
-
-                                        createHeader(tr,table);
-
-                                        const data_div = document.getElementById("data");
-
-                                        /*
-                                        const tr = document.createElement("tr");
-                                        const td = document.createElement("td");
-                                        const td1 = document.createElement("td");
-                                        const td2 = document.createElement("td");
-                                        const td3 = document.createElement("td");
-
-                                        //const td4 = document.createElement("td");
-                                        table.setAttribute("border","1");
-
-                                        table.classList.add("table-responsive");
-                                        table.classList.add("table-bordered");
-                                        //const data_div = document.getElementById("data");
-
-                                        console.log("all ok");
-                                        td.innerHTML="&nbsp &nbsp";
-                                        td1.innerHTML="DS Agent";
-                                        td2.innerHTML="Splunk Status";
-                                        td3.innerHTML="Imperva Status";
-
-                                        td.classList.add("center");
-
-                                        td1.classList.add("center");
-                                        td2.classList.add("center");
-
-                                        td3.classList.add("center");
-                                        tr.appendChild(td);
-                                        tr.appendChild(td1);
-                                        tr.appendChild(td2);
-
-                                        tr.appendChild(td3);
-
-
-                                        table.appendChild(tr);*/
-                                        //data_div.appendChild(table);
-
-                                        row_data=this.responseText.split("\n");
-                                        for (var i = 0; i < row_data.length-1; i++)
-                                        {
-                                                col=row_data[i].split(",");
-                                                col_length = col.length-1
-                                                const tr1 = document.createElement("tr");
-                                                const td_counter = document.createElement("td");
-                                                td_counter.innerHTML=i+1;
-                                                tr1.appendChild(td_counter);
-                                                for (let j = 0; j <=col_length ;j++ )
-                                                {
-                                                        //console.log(j," ",col[j]);
-                                                        const td_service = document.createElement("td");
-                                                        td_service.setAttribute("id",col[j]);
-                                                        if( col[j] == "DSrunning" )
-                                                        {
-                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ok-circle");
-
-                                                                span_element.classList.add("avail");
-                                                                td_service.appendChild(span_element);
-                                                        }
-                                                        else if( col[j] == "DSnotrunning" )
-                                                        {
-                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-remove-circle");
-                                                                span_element.classList.add("not-avail");
-                                                                td_service.appendChild(span_element);
-                                                        }
-
-                                                        else if( col[j] == "SPLrunning" )
-                                                        {
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ok-circle");
-
-                                                                span_element.classList.add("avail");
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-                                                         else if( col[j] == "SPLnotrunning" )
-                                                        {
-                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-remove-circle");
-
-                                                                span_element.classList.add("not-avail");
-                                                                td_service.appendChild(span_element);
-                                                        }
-                                                        else if( col[j] == "Ragentrunning" )
-                                                        {
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ok-circle");
-
-                                                                span_element.classList.add("avail");
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-                                                         else if( col[j] == "Ragentnotrunning" )
-                                                        {
-                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-remove-circle");
-
-                                                                span_element.classList.add("not-avail");
-                                                                td_service.appendChild(span_element);
-                                                        }
-                                                        else if ( col[j] == "active" )
-                                                        {
-
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ok-circle");
-
-                                                                span_element.classList.add("avail");
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-
-
-                                                        else if ( col[j] == "inactive" )
-                                                        {
-
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-remove-circle");
-
-                                                                span_element.classList.add("not-avail");
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-
-                                                        else if ( col[j] == "DS_someissue" )
-                                                        {
-
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ban-circle");
-
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-
-
-                                                        else if ( col[j] == "SPL_someissue" )
-                                                        {
-
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ban-circle");
-
-                                                                td_service.appendChild(span_element);
-
-
-                                                        }
-
-
-
-
-
-
-
-                                                        else if ( col[j] == "undefined" )
-                                                        {
-                                                                span_element = document.createElement("span");
-
-                                                                span_element.classList.add("glyphicon");
-                                                                span_element.classList.add("glyphicon-ban-circle");
-                                                                td_service.appendChild(span_element);
-                                                        }
-
-
-                                                        else if ( col[j] == "" )
-                                                        {
-                                                                //col[j] == "issue while fetching data";
-                                                                td_service.innerHTML="issue";
-                                                        }
-
-                                                        else
-                                                        {
-                                                                //<span class="glyphicon glyphicon-remove-circle"></span>
-                                                                var foundMonths=monthNames.filter(month => col[j].includes(month));
-                                                                if ( foundMonths.length > 0 && j != 9)
-                                                                {
-                                                                        console.log("month found in",j);
-                                                                        const today = new Date();
-                                                                        const targetDate=new Date(col[j]);
-                                                                        const diffmili=targetDate-today;
-                                                                        const diff=Math.round(diffmili/(1000 * 60 * 60 * 24));
-                                                                        td_service.innerHTML=col[j];
-
-                                                                        if ( diff <=5 )
-                                                                        {
-                                                                                td_service.style.backgroundColor="red";
-                                                                        }
-                                                                        else if ( diff >=6 && diff <=10 )
-                                                                        {
-
-                                                                                td_service.style.backgroundColor="orange";
-                                                                        }
-                                                                        else if ( diff <=11 && diff <=15)
-                                                                        {
-
-                                                                                td_service.style.backgroundColor="yellow";
-
-
-                                                                        }
-
-                                                                }
-                                                                else
-                                                                {
-
-
-                                                                        td_service.innerHTML=col[j];
-                                                                        //console.log("print case");
-                                                                }
-                                                        }
-                                                        tr1.appendChild(td_service);
-                                                        tbody.appendChild(tr1);
-                                                }
-
-                                        }
-                                        const tfoot = document.createElement("tfoot");
-                                        const tr_element = document.createElement("tr");
-
-                                        header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
-                                        for(var i=0; i <= header_list.length-1;i++)
-                                        {
-                                                //console.log(header_list[i]);
-                                                const th = document.createElement("th");
-                                                th.innerHTML=header_list[i];
-                                                th.classList.add("center");
-                                                tr_element.appendChild(th);
-
-                                        }
-                                        tfoot.appendChild(tr_element);
-
-
-
-
-                                        table.appendChild(tbody);
-                                         table.appendChild(tfoot);
-                                        data_div.appendChild(table);
-
-
-
-
+                                else {
+                                    td_service.innerHTML=col[j];
                                 }
-                          };
-                          let file_name = "data/combine.txt";
-                          xhttp.open("GET",file_name, true);
-                          xhttp.send();
-                          console.log("Table Created");
+                            }
+                            tr1.appendChild(td_service);
+                            tbody.appendChild(tr1);
                         }
+                    }
+                    
+                    const tfoot = document.createElement("tfoot");
+                    const tr_element = document.createElement("tr");
+                    header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                    
+                    for(var i=0; i <= header_list.length-1;i++) {
+                        const th = document.createElement("th");
+                        th.innerHTML=header_list[i];
+                        th.classList.add("center");
+                        tr_element.appendChild(th);
+                    }
+                    
+                    tfoot.appendChild(tr_element);
+                    table.appendChild(tbody);
+                    table.appendChild(tfoot);
+                    data_div.appendChild(table);
+                }
+            };
+            
+            let file_name = "data/combine.txt";
+            xhttp.open("GET",file_name, true);
+            xhttp.send();
+            console.log("Table Created");
+        }
 
+        getData();
+    </script>
 
-                                getData();
-                </script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="vendor/datatables-responsive/dataTables.responsive.js"></script>
 
-                 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
-                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
-                <script type="text/javascript" charset="utf8" src="vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-                <script type="text/javascript" charset="utf8" src="vendor/datatables-responsive/dataTables.responsive.js"></script>
+    <script>
+        $( window ).on("load", function() {
+            initializeDataTable();
+        });
 
-                <script>
-                        $( window ).on("load", function() {
+        function initializeDataTable() {
+            console.log( "appling data table filter ...." );
+            var table = $('#myTable').DataTable({
+                "processing": true,
+                "pageLength": 10,
+                dom: 'lBfrtip',
+                "lengthMenu": [10,25,50,100],
+                "buttons": [
+                    {
+                        extend: 'collection',
+                        text: 'Export',
+                        buttons: [
+                            'copy',
+                            'excel',
+                            'csv',
+                        ]
+                    }
+                ]
+            });
 
+            $("#myTable tfoot th").each( function ( i ) {
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo( $(this).empty() )
+                    .on( 'change', function () {
+                        table.column( i )
+                            .search( $(this).val() )
+                            .draw();
+                } );
 
-                                initializeDataTable();
+                table.column( i ).data().unique().sort().each( function ( d, j ) {
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                } );
+            } );
 
+            console.log( "table filter applied  ...." );
+        }
 
-
-
-
-
-                        });
-
-
-
-                        function initializeDataTable()
-                        {
-                                 console.log( "appling data table filter ...." );
-                                 var table = $('#myTable').DataTable({
-
-
-                                        "processing":true,
-                                        "pageLength": 10,
-                                         dom: 'lBfrtip',
-
-
-
-
-                                        "lengthMenu": [10,25,50,100],
-                                        "buttons": [
-                                         {
-                                                extend: 'collection',
-                                                text: 'Export',
-                                                buttons: [
-                                                    'copy',
-                                                    'excel',
-                                                    'csv',
-                                                ]
-                                        }
-                                        ]
-
-
-
-                                });
-
-                                $("#myTable tfoot th").each( function ( i ) {
-                                        var select = $('<select><option value=""></option></select>')
-                                            .appendTo( $(this).empty() )
-                                            .on( 'change', function () {
-                                                table.column( i )
-                                                    .search( $(this).val() )
-                                                    .draw();
-                                    } );
-
-                                table.column( i ).data().unique().sort().each( function ( d, j ) {
-                                    select.append( '<option value="'+d+'">'+d+'</option>' )
-                                } );
-                            } );
-
-
-                              console.log( "table filter applied  ...." );
-
-                        }
-
-
-                        $(window).on('beforeunload',function(){
-
-                                initializeDataTable();
-
-                        });
-
-
-
-
-
-
-                </script>
-
-
-
-
-        </body>
-
-
+        $(window).on('beforeunload',function(){
+            initializeDataTable();
+        });
+    </script>
+</body>
 </html>
