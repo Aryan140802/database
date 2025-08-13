@@ -1,0 +1,455 @@
+Alright — here’s the full professional version of your document.
+You can copy all this into a Word file and it will maintain the structure.
+
+
+---
+
+Oracle Database Activity Log - Professional Report
+
+
+---
+
+Oracle GoldenGate 21c Microservices Implementation for Downstream Replication
+
+Description
+
+Installed and configured Oracle GoldenGate 21c Microservices on a downstream server to offload replication load from production databases. Configured for more than two source databases to ensure near real-time data synchronization with target databases.
+
+Reason / Purpose
+
+Reduce replication overhead on production databases.
+
+Ensure real-time or near real-time data replication for reporting and analytics.
+
+Improve performance by using a downstream architecture.
+
+Provide high availability and disaster recovery support.
+
+
+Steps Performed
+
+1. Installed Oracle GoldenGate 21c Microservices on the downstream server.
+
+
+2. Created and configured dedicated users for GoldenGate processes.
+
+
+3. Managed password files and Transparent Data Encryption (TDE) wallet for secure communication.
+
+
+4. Configured multiple source databases for replication to the downstream environment.
+
+
+5. Tested and tuned Extract and Replicat processes for optimal performance.
+
+
+6. Monitored TPS (transactions per second) handling capacity (35k–40k TPS load).
+
+
+7. Validated data consistency between source and target databases.
+
+
+
+Advantages / Benefits
+
+Offloaded replication tasks from production databases, reducing CPU and I/O load.
+
+Achieved high replication throughput (~35k–40k TPS) with minimal latency.
+
+Ensured secure data movement with TDE and encrypted connections.
+
+Provided a scalable architecture to add more sources without impacting production.
+
+Improved availability for analytics and reporting without affecting OLTP workload.
+
+
+Risks and Mitigation
+
+Risk: Network bandwidth issues could impact replication speed.
+Mitigation: Implemented monitoring and alerts; ensured dedicated replication network.
+
+Risk: TDE misconfiguration could cause replication failure.
+Mitigation: Performed pre-deployment testing and backup of wallet files.
+
+Risk: Data inconsistency during cutover.
+
+
+
+---
+
+New Archival Database Creation during Database Migration for Character Set Change
+
+Description
+
+Created a new archival RAC database during migration from the old server to the new server, with an updated character set to meet application requirements. The setup included a physical standby database for disaster recovery and Transparent Data Encryption (TDE) for enhanced data security.
+
+Reason / Purpose
+
+Support migration to a new server while upgrading the database character set.
+
+Create a dedicated archival database to store historical data securely.
+
+Improve disaster recovery capabilities by implementing a standby database.
+
+Ensure data security compliance with TDE encryption.
+
+
+Steps Performed
+
+1. Analyzed existing database schema and data for compatibility with the new character set.
+
+
+2. Created a new RAC database on the target server with the required character set.
+
+
+3. Implemented Transparent Data Encryption (TDE) for all sensitive tablespaces.
+
+
+4. Configured a physical standby database for high availability and DR.
+
+
+5. Migrated archival data from the old server to the new RAC environment.
+
+
+6. Performed application and query testing to validate the new character set.
+
+
+7. Monitored and tuned performance post-migration.
+
+
+
+Advantages / Benefits
+
+Dedicated archival database reduces load on production systems.
+
+RAC architecture ensures high availability and scalability.
+
+Standby database provides robust disaster recovery with minimal RPO/RTO.
+
+TDE implementation ensures compliance with data security policies.
+
+New character set improves compatibility for multilingual application support.
+
+
+Risks and Mitigation
+
+Risk: Data corruption during migration due to character set mismatch.
+Mitigation: Pre-migration testing using Data Pump with character set validation.
+
+Risk: TDE wallet issues during standby synchronization.
+Mitigation: Configured wallet auto-open and verified on both primary and standby.
+
+Risk: RAC node failure during cutover.
+Mitigation: Conducted failover simulation tests before go-live.
+
+
+Outcome / Result
+
+Successful migration to new RAC environment with upgraded character set.
+
+Seamless archival data access with no impact on production workloads.
+
+Fully secure database environment compliant with encryption standards.
+
+
+
+---
+
+Transparent Data Encryption (TDE) Implementation on HIDB Primary and Standby Databases
+
+Description
+
+Implemented Oracle Transparent Data Encryption (TDE) on the HIDB primary and standby databases to secure sensitive data at rest. This included encryption of all required tablespaces, wallet creation, configuration on both primary and standby, and validation of synchronization for disaster recovery readiness.
+
+Reason / Purpose
+
+Protect sensitive data at rest in compliance with security and audit policies.
+
+Ensure encryption is enabled consistently across both primary and standby databases.
+
+Reduce risk of unauthorized data access in case of storage theft or backup compromise.
+
+
+Steps Performed
+
+1. Analyzed database tablespaces to determine encryption requirements.
+
+
+2. Created and configured the TDE wallet on the primary database.
+
+
+3. Enabled encryption for selected tablespaces and confirmed with V$ENCRYPTED_TABLESPACES.
+
+
+4. Copied wallet files securely to standby database nodes.
+
+
+5. Configured wallet auto-open and validated on both primary and standby.
+
+
+6. Verified Data Guard synchronization to ensure encrypted data was replicated properly.
+
+
+7. Tested failover and switchover scenarios to confirm TDE functionality in standby mode.
+
+
+
+Advantages / Benefits
+
+Full compliance with corporate and regulatory data protection policies.
+
+Data encryption without significant performance degradation.
+
+Seamless integration with Data Guard standby configuration.
+
+Enhanced security for backups and archived logs.
+
+
+Risks and Mitigation
+
+Risk: Wallet misconfiguration could prevent database startup.
+Mitigation: Tested wallet open/close procedures and kept secure backups.
+
+Risk: Encryption of large tablespaces could impact performance.
+Mitigation: Performed encryption in a phased manner during low-load windows.
+
+Risk: Data Guard synchronization issues after encryption.
+Mitigation: Verified redo apply on standby after each encryption step.
+
+
+Outcome / Result
+
+Successful implementation of TDE across primary and standby HIDB databases.
+
+Encrypted tablespaces synchronized seamlessly with standby.
+
+Improved security posture with minimal downtime and no data loss.
+
+
+
+---
+
+TLS Implementation for Secure Database Connections
+
+Description
+
+Implemented TLS for secure communication between the application and database in the UAT environment, followed by successful deployment to the production system. This included configuring secure wallets at the database level, updating listeners and SCAN listeners online without impacting applications, and updating ODBC settings on the application server to support TLS-based connections.
+
+Reason / Purpose
+
+Enhance database connection security by encrypting communication between applications and the database.
+
+Meet compliance and security audit requirements.
+
+Ensure secure mutual authentication between the database and application servers.
+
+
+Steps Performed
+
+1. Created secure wallets at the database level and configured them for TLS.
+
+
+2. Registered the wallet with the database for encrypted connections.
+
+
+3. Configured database listeners and SCAN listeners to support TLS without downtime.
+
+
+4. Updated ODBC settings on the application server to enable TLS connectivity.
+
+
+5. Shared wallet certificates securely with the application server for SSL/TLS handshake.
+
+
+6. Tested TLS connection in the UAT environment for functional and performance validation.
+
+
+7. Migrated configuration changes to the production environment with zero application downtime.
+
+
+8. Verified TLS encryption using V$SESSION_CONNECT_INFO and network trace checks.
+
+
+
+Risks and Mitigation
+
+Challenge: Updating listeners and SCAN listeners online without impacting active connections.
+Mitigation: Used rolling listener restarts and verified connection failover to other nodes.
+
+Challenge: ODBC configuration changes required coordinated downtime on the application server.
+Mitigation: Scheduled ODBC updates during off-peak hours and tested rollback procedures.
+
+Challenge: Wallet distribution and handshake validation between DB and application.
+Mitigation: Used secure file transfer with checksum validation; tested handshake in staging before production rollout.
+
+
+Advantages / Benefits
+
+Encrypted communication between application and database ensures data-in-transit protection.
+
+Reduced risk of man-in-the-middle (MITM) attacks.
+
+Achieved compliance with internal and external security requirements.
+
+Seamless migration to TLS without impacting ongoing application transactions.
+
+
+Outcome / Result
+
+Successful TLS implementation across UAT and production environments.
+
+Zero downtime during production rollout.
+
+Verified encryption and handshake for all application-to-database connections.
+
+
+
+---
+
+Online Datafile Movement for Archival Database – High-to-Low Performance Disk Segregation
+
+Description
+
+Performed online movement of datafiles in the Archival Database as per bank compliance requirements. The policy mandates storing the latest three months of data on high-performance disks and migrating older data to low-performance disks. The activity is conducted monthly, moving datafiles from ARCHDATA to EISDATA diskgroups for tablespaces storing data older than three months.
+
+Reason / Purpose
+
+Comply with bank’s storage policy for cost optimization and performance segregation.
+
+Maintain high-performance access for recent data while optimizing storage costs for older data.
+
+Ensure archival database storage tiers are utilized efficiently.
+
+
+Steps Performed
+
+1. Identified tablespaces containing data older than three months.
+
+
+2. Selected eligible datafiles for migration based on last modification date and size.
+
+
+3. Executed ALTER DATABASE MOVE DATAFILE command online to move datafiles from ARCHDATA to EISDATA diskgroup.
+
+
+4. Monitored movement duration (average 3–4 minutes per file) and performance impact.
+
+
+5. Verified file location updates in DBA_DATA_FILES.
+
+
+6. Repeated activity monthly to maintain ongoing compliance.
+
+
+
+Risks and Mitigation
+
+Challenge: Risk of impacting performance during movement.
+Mitigation: Scheduled migration during low-load windows; moved files sequentially.
+
+Challenge: Large volume of files (3500+ total moved to date).
+Mitigation: Automated file selection scripts to reduce manual effort.
+
+Challenge: Potential space shortage in target diskgroup during peak archival loads.
+Mitigation: Pre-migration space validation and alerts.
+
+
+Advantages / Benefits
+
+Maintains compliance with bank’s performance-tier storage policy.
+
+Optimizes use of high-performance disks for recent operational queries.
+
+Reduces storage costs by using lower-tier disks for older data.
+
+Activity is performed online with minimal disruption to users.
+
+
+Outcome / Result
+
+Successfully moved ~3500 datafiles from ARCHDATA to EISDATA diskgroup to date.
+
+Continuous monthly process ensures adherence to retention and storage policies.
+
+Achieved performance balance and cost savings without affecting availability.
+
+
+
+---
+
+Post-Archiving Table Compression in Archival Database using HCC
+
+Description
+
+Due to Oracle GoldenGate’s lack of support for data compression at the target database, the archived tables in the Archival Database had the same size as the Production Database, leading to inefficient storage usage. To address this, we implemented post-archiving table compression in the Archival Database using the DBMS_PARALLEL_EXECUTE utility with Hybrid Columnar Compression (HCC) to achieve optimal space savings.
+
+Reason / Purpose
+
+Reduce storage footprint in the Archival Database without impacting GoldenGate replication.
+
+Improve storage utilization and reduce infrastructure costs.
+
+Maintain data availability for queries while optimizing disk space usage.
+
+
+Steps Performed
+
+1. Identified large tables and partitions that had already been archived from Production to the Archival Database.
+
+
+2. Selected one partition at a time for compression to minimize performance impact.
+
+
+3. Used DBMS_PARALLEL_EXECUTE to parallelize the compression process for high-volume data.
+
+
+4. Applied Hybrid Columnar Compression (HCC) for maximum compression ratio.
+
+
+5. Validated data integrity and index usability after compression.
+
+
+6. Updated storage reports to track space savings achieved.
+
+
+
+Risks and Mitigation
+
+Challenge: Avoiding GoldenGate replication conflicts while compressing data.
+Mitigation: Performed compression only after data was fully archived and replication stopped for that partition.
+
+Challenge: Long compression times for large partitions.
+Mitigation: Executed compression in parallel and off-peak hours.
+
+Challenge: Maintaining query performance after HCC.
+Mitigation: Applied compression only to older, less frequently queried data.
+
+
+Advantages / Benefits
+
+Significant storage savings: reduced ~170TB to ~50TB (1:4 compression ratio).
+
+Optimized storage utilization for archival data without impacting OLTP workloads.
+
+Reduced backup storage requirements and associated costs.
+
+Process can be repeated regularly for newly archived data.
+
+
+Outcome / Result
+
+Completed compression for six large table partitions to date.
+
+Achieved an average 1:4 compression ratio using HCC.
+
+Freed over 120TB of storage, resulting in substantial cost and capacity benefits.
+
+Established an ongoing monthly process for future archival partitions.
+
+
+
+---
+
+I kept your original technical depth but organized it for professional readability.
+
+Do you want me to now add an executive summary at the start so this is ready for use in interviews or audits?
