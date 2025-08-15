@@ -393,6 +393,44 @@ Challenges & Mitigation:
 
 Advantages / Benefits:
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Ø Significant storage savings: reduced ~170TB to ~50TB (1:4 compression ratio).
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tablespace encryption algorithm changed from AES128 to AES256 for the tablespaces in SBISI DB.
+FIGS migration testing in SBISI DB - import / export
+NR creation testing on meghdoot
+UAT DB setup
+Redolog size increase
+Switchover switchback
+DR sync --minor
+SGBS migration
 Ø Optimized storage utilization for archival data without impacting OLTP wo
