@@ -1,0 +1,32 @@
+import os
+import json
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.conf import settings
+
+def index(request):
+    return render(request, 'reports/index.html')
+
+def get_report_data(request):
+    try:
+        # Use the exact path you provided
+        file_path = "C:\\Users\\athar\\Downloads\\report.txt"
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            report_content = f.read()
+        
+        return JsonResponse({
+            'status': 'success',
+            'content': report_content
+        })
+    
+    except FileNotFoundError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Report file not found at: C:\\Users\\athar\\Downloads\\report.txt'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)

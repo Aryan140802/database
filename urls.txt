@@ -1,0 +1,8 @@
+# reports/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('get-report/', views.get_report_data, name='get_report_data'),
+]
