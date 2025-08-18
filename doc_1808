@@ -1,0 +1,77 @@
+11. New UAT Database Setup for [Project/System Name]
+Date:
+*(Insert date — e.g., 25-September-2025)*
+
+Environment:
+UAT – [Server Name, e.g., "Meghdoot"]
+
+Description:
+A new UAT database was provisioned to support testing for the upcoming [Project/System Name] release. The database was configured to mirror production specifications, including schema objects, users, and security policies, with sanitized test data.
+
+Reason / Purpose:
+
+Provide a stable environment for functional, integration, and performance testing.
+
+Isolate UAT activities from production and other non-production databases.
+
+Validate database changes (schema, patches, parameters) before production rollout.
+
+Comply with audit requirements for test-data masking.
+
+Steps Performed:
+
+Infrastructure Provisioning:
+
+Allocated storage (ASM diskgroups), CPU, and memory resources.
+
+Installed Oracle binaries (19c/23c) with latest PSU patches.
+
+Database Creation:
+
+Used DBCA (silent mode) with preconfigured templates.
+
+Set critical parameters (SGA_TARGET, PGA_AGGREGATE_TARGET, OPTIMIZER_FEATURES_ENABLE).
+
+Security & Access:
+
+Configured TDE (Transparent Data Encryption) for tablespaces.
+
+Created roles and users with least-privilege principles.
+
+Enabled auditing for DDL and sensitive DML operations.
+
+Schema & Data Setup:
+
+Imported production schema using DATA PUMP (with REMAP_SCHEMA).
+
+Applied data masking rules to PII/PHI columns via DBMS_REDACT.
+
+Loaded test data subsets using SQL*Loader.
+
+Validation:
+
+Verified connectivity from application servers.
+
+Ran smoke tests for critical transactions.
+
+Confirmed backups/RMAN scripts were operational.
+
+Challenges & Mitigation:
+
+Challenge	Mitigation
+Storage underestimated for test data.	Extended ASM diskgroups with additional LUNs.
+Performance lag during load tests.	Adjusted SGA and added optimizer hints.
+Data masking broke test scenarios.	Refined redaction policies with dev team input.
+Advantages / Benefits:
+
+Consistency: Mirrors production setup to reduce deployment risks.
+
+Security: Compliant with data privacy regulations (e.g., GDPR).
+
+Efficiency: Self-service access for QA teams via dedicated schemas.
+
+Outcome / Result:
+
+UAT database operational within [X] hours of request.
+
+Successful execution of [X] test cycles with zero critical defects
