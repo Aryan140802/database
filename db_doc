@@ -1,0 +1,440 @@
+5. Archiving Table Compression in Archival Database (HCC)
+
+
+Date:
+
+(Ongoing – Since [Insert Start Month-Year])
+
+
+Environment:
+
+Ø Production – Archival Database
+
+
+Description:
+
+Ø Due to Oracle GoldenGate’s lack of support for data compression at the target database, the archived tables in the Archival Database had the same size as the Production Database, leading to inefficient storage usage. To address this, we implemented post-archiving table compression in the Archival Database using the DBMS_PARALLEL_EXECUTE utility with Hybrid Columnar Compression (HCC) to achieve optimal space savings.
+
+
+Reason / Purpose:
+
+Ø Reduce storage footprint in the Archival Database without impacting GoldenGate replication.
+
+Ø Improve storage utilization and reduce infrastructure costs.
+
+Ø Maintain data availability for queries while optimizing disk space usage.
+
+
+Steps Performed:
+
+Ø Identified large tables and partitions that had already been archived from Production to the Archival Database.
+
+Ø Selected one partition at a time for compression to minimize performance impact.
+
+Ø Used DBMS_PARALLEL_EXECUTE to parallelize the compression process for high-volume data.
+
+Ø Applied Hybrid Columnar Compression (HCC) for maximum compression ratio.
+
+Ø Validated data integrity and index usability after compression.
+
+Ø Updated storage reports to track space savings achieved.
+
+
+Challenges & Mitigation:
+
+Ø Challenge: Avoiding GoldenGate replication conflicts while compressing data.
+
+Ø Mitigation: Performed compression only after data was fully archived and replication stopped for that partition.
+
+Ø Challenge: Long compression times for large partitions.
+
+Ø Mitigation: Executed compression in parallel and off-peak hours.
+
+Ø Challenge: Maintaining query performance after HCC.
+
+Ø Mitigation: Applied compression only to older, less frequently queried data.
+
+
+Advantages / Benefits:
+
+Ø Significant storage savings: reduced ~170TB to ~50TB (1:4 compression ratio).
+
+Ø Optimized storage utilization for archival data without impacting OLTP workloads.
+
+Ø Reduced backup storage requirements and associated costs.
+
+Ø Process can be repeated regularly for newly archived data.
+
+
+Outcome / Result:
+
+Ø Completed compression for six large table partitions to date.
+
+Ø Achieved an average 1:4 compression ratio using HCC.
+
+Ø Freed over 120TB of storage, resulting in substantial cost and capacity benefits.
+
+Ø Established an ongoing monthly pro
+
+6. Tablespace Encryption Algorithm Change from AES128 to AES256 (SBISI Database)
+
+
+Ø Date:
+
+Ø (Insert date here — e.g., 30-June-2024)
+
+Ø
+
+Environment:
+
+Ø Production – SBISI Database
+
+
+Ø Description:
+
+Upgraded the encryption algorithm used for TDE (Transparent Data Encryption) on all relevant tablespaces in the SBISI database from AES128 to AES256, enhancing the overall data security posture. The change was applied on both primary and standby environments, ensuring full encryption consistency and compliance with evolving security standards.
+
+
+Reason / Purpose:
+
+
+Ø Align with updated internal and external regulatory requirements for stronger encryption standards.
+
+Ø Improve database resilience against advanced threats through stronger encryption.
+
+Ø Standardize encryption algorithms across critical databases to AES256.
+
+Ø Ensure future readiness for audit and compliance mandates.
+
+
+Steps Performed:
+
+
+Ø Verified current encryption status using V$ENCRYPTED_TABLESPACES and V$TABLESPACE.
+
+Ø Identified all tablespaces encrypted with AES128.
+
+Ø Scheduled maintenance window to minimize impact on performance.
+
+Ø Used ALTER TABLESPACE ... ENCRYPTION with ENCRYPT USING 'AES256' REKEY to re-encrypt each tablespace online.
+
+Ø Confirmed updated encryption algorithm using dynamic views post-change.
+
+Ø Validated application connectivity and performance post-modification.
+
+Ø Repeated the same process on the standby database to maintain TDE synchronization.
+
+Ø Tested TDE wallet operations and Data Guard redo apply after the algorithm change.
+
+
+Advantages / Benefits:
+
+Ø
+
+Ø Enhanced data protection with stronger 256-bit encryption.
+
+Ø Compliance with stricter regulatory and audit guidelines.
+
+Ø Seamless upgrade without needing to decrypt and re-encrypt data externally.
+
+Ø No data movement or downtime required; change performed online.
+
+Ø Consistent TDE configuration across primary and standby databases.
+
+
+Risks / Challenges & Mitigation:
+
+
+Ø Risk: Performance overhead during encryption algorithm upgrade.
+
+Ø Mitigation: Performed encryption during low-traffic hours with performance monitoring.
+
+
+Ø Risk: Wallet compatibility issues after algorithm change.
+
+Ø Mitigation: Validated wallet operations pre- and post-upgrade; backups taken before the change.
+
+
+Ø Risk: Data Guard synchronization delays.
+
+Ø Mitigation: Monitored redo apply lag and ensured standby caught up before resync.
+
+
+Outcome / Result:
+
+
+Ø Successful transition of all TDE-enabled tablespaces in SBISI database from AES128 to AES256.
+
+Ø No impact on application availability or performance.
+
+Ø Verified encryption level upgrade across primary and standby environments.
+
+Ø Achieved stronger data security and compliance with updated encryption standards.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7. NR Database Creation on Meghdoot Server (UAT Environment)
+
+
+Date:
+
+(Insert date here — e.g., 15-August-2025)
+
+
+Environment:
+
+UAT – Meghdoot Server
+
+
+Description:
+
+
+A new NR (Name of the system/project) database was successfully created in the UAT environment on the Meghdoot server. This database instance is intended for functional and integration testing prior to production rollout.
+
+
+Reason / Purpose:
+
+
+Ø Facilitate testing of upcoming features and integrations in a controlled environment.
+
+Ø Provide developers and QA teams with a sandbox environment that mirrors production.
+
+Ø Support validation cycles, including performance and regression testing.
+
+Ø Enable early detection of bugs and environment-specific issues.
+
+
+Steps Performed:
+
+
+Ø Provisioned required system resources (CPU, memory, storage) on Meghdoot server.
+
+Ø Installed Oracle Database binaries (if not already installed).
+
+Ø Created a new database instance using DBCA with necessary initialization parameters.
+
+Ø Configured listener and TNS entries for connectivity.
+
+Ø Enabled necessary options (e.g., TDE, auditing, etc.) based on project requirements.
+
+Ø Created users, schemas, and roles as per project specification.
+
+Ø Imported required seed data/schema objects for testing.
+
+Ø Validated database connectivity from application layer and SQL clients.
+
+Ø Performed initial health checks and log verification.
+
+
+Advantages / Benefits:
+
+
+Ø Isolated testing environment without affecting production.
+
+Ø Allows testing of database configurations, patches, or changes before rollout.
+
+Ø Supports test-driven development and early validation.
+
+Ø Provides realistic UAT feedback for fine-tuning the application and database setup.
+
+Ø Enables secure and auditable data handling practices during testing.
+
+
+Risks / Challenges & Mitigation:
+
+
+Ø Risk: Configuration mismatch with production.
+
+Ø Mitigation: Followed standardized setup documentation and production parameter baselines.
+
+
+Ø Risk: Improper access or data leaks in UAT.
+
+Ø Mitigation: Ensured UAT data is masked or sanitized; access restricted to authorized personnel.
+
+
+Ø Risk: Performance issues during concurrent testing.
+
+Ø Mitigation: Allocated appropriate system resources; performance monitored post-deployment.
+
+
+Outcome / Result:
+
+
+Ø Successfully created and configured the NR database in the UAT environment.
+
+Ø Verified accessibility, stability, and baseline performance.
+
+Ø Ready for functional, regression, and integration testing by QA and dev teams.
+
+Ø Aligned with the planned project timelines for pre-production activities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Switchover and Switchback of Production Databases (SBISI & Report) – Manual Role Swap by Stopping/Starting Instances
+
+
+Date:
+
+(Insert date — e.g., 15-August-2025)
+
+
+Environment:
+
+Production – SBISI and Report Databases
+
+
+Description:
+
+
+Performed manual switchover and switchback of primary and standby roles for SBISI and Report production databases by stopping and starting the Oracle instances at the OS/service level. This process transitioned the primary to standby and standby to primary roles without using DGMGRL or explicit SQL shutdown commands.
+
+
+Role Changes:
+
+
+Switchover:
+
+
+Stopped the Oracle instance on the primary server (which shuts down the database instance).
+
+
+Started the instance in standby mode to convert it to standby role.
+
+
+Stopped the Oracle instance on the standby server.
+
+
+Started the instance and opened the database read-write to convert it to primary role.
+
+
+Switchback:
+
+
+Reversed the roles by repeating the stop/start instance operations on both servers, restoring original primary and standby roles.
+
+
+Steps Performed:
+
+
+Verified current database roles (SELECT database_role FROM v$database;).
+
+
+Stopped the Oracle instance on the primary server (e.g., via OS service or Oracle commands).
+
+
+Started the instance in mount mode with managed recovery to enable standby role.
+
+
+Stopped the Oracle instance on the standby server.
+
+
+Started the instance and opened the database read-write to promote it to primary role.
+
+
+Verified role changes and database status post switchover.
+
+
+For switchback, repeated stopping and starting instances on respective servers to restore original roles.
+
+
+Confirmed Data Guard synchronization and application connectivity after each operation.
+
+
+Outcome:
+
+
+Successful role transitions between primary and standby via instance stop/start operations.
+
+
+No data loss and controlled downtime during instance restarts.
+
+
+Data Guard synchronization and redo apply confirmed post-switchover/switchback.
+
+
+Application connections stable and v
