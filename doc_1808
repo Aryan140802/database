@@ -158,3 +158,389 @@ Post-change monitoring confirmed log switches reduced from [Old Frequency] to [N
 
 
 ===================================================================================================
+
+
+
+13. Database Backup, Recovery, and Restoration through Commvault
+
+Date:
+(Insert date — e.g., 28-September-2025)
+
+Environment:
+Production & Non-Production – [Server Name, e.g., "Shankara", "Meghdoot"]
+
+Description:
+Commvault was implemented and configured as the enterprise backup and recovery solution for Oracle databases. Backup strategies were aligned with RPO/RTO objectives, ensuring consistent and secure protection of critical data. The setup supports full, incremental, and archive log backups with streamlined restoration workflows.
+
+Reason / Purpose:
+
+Centralize backup management across all Oracle database environments.
+
+Enable reliable and efficient point-in-time recovery (PITR) capabilities.
+
+Automate backup scheduling and retention policy enforcement.
+
+Ensure compliance with disaster recovery (DR) and audit requirements.
+
+Steps Performed:
+
+Commvault Agent Deployment:
+
+Installed Oracle iDataAgent on database servers.
+
+Registered database clients in Commvault CommCell Console.
+
+Verified connectivity between Media Agent and client systems.
+
+Backup Configuration:
+
+Configured full, incremental, and archive log backup policies.
+
+Enabled RMAN integration with Commvault using Oracle Recovery Manager scripts.
+
+Defined schedules and retention rules as per business SLA (e.g., 14 days for full backups, 7 days for logs).
+
+Security and Storage Setup:
+
+Applied encryption for backup data at rest and in transit.
+
+Configured storage policies pointing to Commvault disk libraries and/or tape libraries.
+
+Implemented auxiliary copy for offsite retention.
+
+Recovery & Restoration Testing:
+
+Performed full database restore on staging servers for UAT validation.
+
+Executed point-in-time recovery using archived logs.
+
+Tested tablespace-level and datafile-level restores to validate partial recovery options.
+
+Validation:
+
+Monitored Commvault job dashboard for backup success/failure.
+
+Verified RMAN catalog synchronization.
+
+Ensured backups were listed and retrievable from CommCell console.
+
+Performed checksum validation for restored data.
+
+Challenges & Mitigation:
+
+One key challenge was initial misconfiguration of RMAN channels, which led to slow backup throughput. This was addressed by tuning the number of parallel channels and balancing the load across multiple streams.
+
+During restoration tests, we encountered issues with archive log retention gaps. This was mitigated by adjusting log backup frequency and increasing log retention periods in Commvault to align with recovery windows.
+
+Some servers had firewall restrictions that blocked communication between Commvault components. Network teams resolved this by updating firewall rules and enabling required ports.
+
+In a few cases, backup jobs failed due to permission errors on Oracle directories. We resolved this by standardizing OS-level permissions and user group memberships.
+
+Advantages / Benefits:
+
+Reliability: Automated and consistent backup jobs with monitoring and alerting.
+
+Recovery Assurance: Proven ability to perform full and point-in-time restores.
+
+Compliance: Meets business continuity and audit requirements.
+
+Scalability: Supports multiple environments and large data volumes efficiently.
+
+Outcome / Result:
+
+Commvault backups fully operational for [X] Oracle databases across [Y] environments.
+Successful validation of full and PITR restore scenarios.
+Reduced manual intervention and improved backup success rate to over [Z]%.
+
+================================================================================================
+
+14. PMASCHEME Migration
+
+Date:
+(Insert date — e.g., 30-September-2025)
+
+Environment:
+Source: Production – SBISI Database
+Target: FIGS Department – [Target Database Name, e.g., "FIGSDB"]
+
+Description:
+Application objects related to the PMSCHEME module were successfully migrated from the SBISI production database to the FIGS department’s dedicated database. The migration included database schema objects, packages, procedures, and related metadata necessary for independent operation by the FIGS team.
+
+Reason / Purpose:
+
+Decouple PMASCHEME-related functionality from the centralized SBISI production database.
+
+Enable FIGS department to maintain and manage the PMSCHEME module independently.
+
+Improve performance and ownership for FIGS-specific workflows and reporting.
+
+Facilitate future enhancements and testing without impacting SBISI production.
+
+Steps Performed:
+
+Pre-Migration Analysis:
+
+Identified all relevant database objects (tables, views, procedures, packages, synonyms) under the PMSCHEME schema.
+
+Verified dependencies using DBA_DEPENDENCIES and cross-schema references.
+
+Coordinated with application and FIGS stakeholders to confirm the migration scope.
+
+Export & Import:
+
+Exported the PMSCHEME schema using Oracle Data Pump (expdp) from SBISI.
+
+Used REMAP_SCHEMA and REMAP_TABLESPACE options as needed.
+
+Imported the dump into FIGS database via impdp with necessary remappings.
+
+Post-Migration Setup:
+
+Created and granted roles and privileges specific to FIGS users.
+
+Validated object ownership and privileges to ensure application compatibility.
+
+Recompiled invalid objects and confirmed all packages/procedures were operational.
+
+Application Integration:
+
+Updated application configurations to point to the new FIGS database.
+
+Modified database links and credentials where required.
+
+Performed connection and functional validation with FIGS application users.
+
+Validation:
+
+FIGS team successfully ran key business transactions using the migrated setup.
+
+Verified data integrity between source and target for critical tables.
+
+Confirmed application logs, audit trails, and database triggers were functioning as expected.
+
+Challenges & Mitigation:
+
+During initial imports, object name conflicts were observed in the target FIGS database. These were resolved by renaming legacy objects and backing them up before the final import.
+
+There were also issues with invalid packages due to missing dependencies on common libraries. These were fixed by creating necessary synonyms and ensuring library access.
+
+Connectivity between the application server and FIGS database required TNS and wallet updates, which were coordinated with the infrastructure team to ensure secure and successful connections.
+
+Advantages / Benefits:
+
+Decoupling: Application is now isolated from SBISI, reducing cross-team dependency.
+
+Ownership: FIGS department can independently manage the application lifecycle.
+
+Performance: Reduced load on SBISI production database and improved responsiveness for FIGS users.
+
+Outcome / Result:
+
+Migration completed successfully with all PMSCHEME objects transferred to the FIGS environment.
+Application validated by FIGS business users, with no critical issues reported post-migration.
+System now supports autonomous development, testing, and reporting by the FIGS team.
+
+============================================================================================================
+
+
+
+15. Standby Database Management and Emergency Switchover Readiness
+
+Date:
+(Insert date — e.g., 02-October-2025)
+
+Environment:
+Production and Disaster Recovery (DR) – All Oracle Databases
+Backhaul Network IP: [Insert IP/Subnet Details]
+
+Description:
+Standby databases were actively managed to ensure high availability and disaster recovery readiness. Archive log space was monitored and maintained at both production (PR) and disaster recovery (DR) sites. Dedicated listeners were configured on backhaul IP interfaces to mitigate risks associated with local network outages, ensuring switchover capability even when the production server's local Oracle IP is unreachable.
+
+Reason / Purpose:
+
+Maintain continuous data replication from production to standby databases.
+
+Ensure archive log space availability to prevent transport lag or data loss.
+
+Provide a resilient switchover mechanism independent of production IP/network.
+
+Support seamless transition to DR with minimal downtime in case of production failure.
+
+Steps Performed:
+
+Archive Log Management:
+
+Set up monitoring scripts to alert on archive log space utilization at both PR and DR.
+
+Configured thresholds and auto-purge policies to avoid log shipping failures.
+
+Regular validation of archive log shipping status using v$archive_dest_status.
+
+Listener Configuration on Backhaul IP:
+
+Created dedicated Oracle listeners bound to backhaul interface IPs.
+
+Updated tnsnames.ora and listener.ora files to include backhaul connectivity.
+
+Tested listener responsiveness from DR site and validated remote connections.
+
+Ensured entries for these listeners exist in Data Guard configuration via dgmgrl.
+
+Switchover Capability Over Backhaul Network:
+
+Validated that Data Guard Broker can manage configuration via backhaul IP.
+
+Performed test switchovers using dgmgrl with connections routed via backhaul.
+
+Ensured standby role transition was smooth even when production host’s local Oracle listener was inaccessible.
+
+Ongoing Maintenance Activities:
+
+Weekly review of archive log usage and standby lag metrics.
+
+Monthly DR drill simulation using backhaul network for failover and switchover.
+
+Quarterly re-validation of listener configuration and Data Guard Broker endpoints.
+
+Patch management and version alignment between PR and DR environments.
+
+Challenges & Mitigation:
+
+One challenge was managing archive log retention to avoid space exhaustion, especially during high load periods. This was mitigated by implementing automatic deletion of applied logs on DR and increasing archive log storage thresholds.
+
+Another issue was initial network latency observed over the backhaul connection. Network configurations were fine-tuned and routing priorities adjusted to ensure reliable Data Guard communication over the backhaul IPs.
+
+DNS resolution conflicts also arose when introducing alternate listeners. These were resolved by using static IP-based TNS entries and avoiding dependency on DNS for DR operations.
+
+Advantages / Benefits:
+
+Resilience: Enables DR switchover even if production's Oracle network is down.
+
+Continuity: Ensures data protection with real-time log shipping and archive management.
+
+Control: DBA team can initiate and control switchover via backhaul listeners without relying on production server availability.
+
+Preparedness: Supports audit and compliance requirements for DR readiness.
+
+Outcome / Result:
+
+Standby databases across all environments are now fully monitored and switchover-ready using the backhaul network.
+Emergency drills confirmed successful transitions without production listener access, enhancing overall DR posture and reducing RTO.
+
+
+===========================================================================
+
+
+16. Manual Switchover and Switchback Management
+
+Date:
+(Insert date — e.g., 03-October-2025)
+
+Environment:
+
+Switchover Targets: SBISI DB, Report DB
+
+Active-Active Setup: MIBDB and HIBDB
+
+Method: Manual (SQL and OS-level scripts, not using dgmgrl)
+
+Description:
+Manual switchover and switchback processes were performed for the SBISI and Report DB environments. These activities ensure database availability during planned maintenance or infrastructure changes. For MIBDB and HIBDB, an active-active setup is maintained, and key application tables are manually synchronized prior to any controlled role transition.
+
+Reason / Purpose:
+
+Maintain high availability and operational continuity.
+
+Enable planned infrastructure or patching work on primary environments.
+
+Provide flexibility for environment rotation and DR readiness validation.
+
+Ensure consistency in application data in active-active DBs before role changes.
+
+Steps Performed:
+
+For SBISI and Report DB (Manual Switchover):
+
+Pre-checks:
+
+Verified archive log sync on standby using v$archive_gap and v$archive_dest_status.
+
+Ensured no active long-running sessions on the primary.
+
+Confirmed RMAN backups were current.
+
+Primary to Standby Transition:
+
+On primary:
+ALTER DATABASE COMMIT TO SWITCHOVER TO PHYSICAL STANDBY WITH SESSION SHUTDOWN;
+
+Shutdown and mount primary in standby mode.
+
+On standby:
+ALTER DATABASE COMMIT TO SWITCHOVER TO PRIMARY;
+
+Open new primary with RESETLOGS.
+
+Verified listener and application connectivity.
+
+Post-switchover validation:
+
+Confirmed redo shipping from new primary to new standby.
+
+Monitored alert logs and archive log application.
+
+Application and reporting tools were pointed to the new primary.
+
+Switchback Process:
+
+Same steps as above, executed in reverse order after maintenance completed.
+
+Ensured log gap closure before role reversal.
+
+For MIBDB and HIBDB (Active-Active):
+
+Pre-switchover Sync:
+
+Identified and synchronized critical application tables using manual export/import or custom sync scripts.
+
+Ensured no uncommitted DML on the source.
+
+Role Coordination:
+
+Applications were re-routed to the alternate DB instance.
+
+Standby role manually transitioned as needed based on infrastructure readiness.
+
+Verified archive log continuity post role adjustment.
+
+Validation:
+
+Ensured data consistency across both instances.
+
+Validated connectivity from app tier to new active node.
+
+Restarted scheduled jobs and alerts, if needed.
+
+Challenges & Mitigation:
+
+Manual switchover required precise coordination to avoid data gaps. This was mitigated through a well-documented checklist and real-time collaboration between DBAs and app teams.
+
+Active-active setup introduced risk of data drift if sync was not properly managed. Rigorous table-level checks and checksum comparisons were done pre-switchover to ensure consistency.
+
+Application-side DNS or connection string mismatches were occasionally found post-switchover. A rollback procedure and quick TNS name updates were kept ready to minimize downtime.
+
+Advantages / Benefits:
+
+Flexibility: Full control of role transition without dependency on Data Guard Broker.
+
+Reliability: Proven process for SBISI and Report DB switchovers with zero data loss.
+
+Continuity: Active-active setup for MIBDB/HIBDB ensures distributed load and high availability.
+
+Control: Sync of application tables before role switch reduces risk of data mismatch.
+
+Outcome / Result:
+
+Successful manual switchover and switchback operations for SBISI and Report DB, with minimal downtime and validated application continuity.
+MIBDB and HIBDB continue to operate in active-active mode, with pre-switchover syncs ensuring consistent performance and data integrity.
+
