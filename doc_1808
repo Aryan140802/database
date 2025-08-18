@@ -75,3 +75,86 @@ Outcome / Result:
 UAT database operational within [X] hours of request.
 
 Successful execution of [X] test cycles with zero critical defects
+
+===============================================================================================================
+
+12. Redo Log Size Increase
+
+Date:
+(Insert date — e.g., 27-September-2025)
+
+Environment:
+Production – [Server Name, e.g., "Arunachala"]
+
+Description:
+Redo log file sizes were increased to optimize database performance and reduce frequent log switches during peak transactional periods. The change was applied after careful monitoring and analysis of log switch frequency and checkpoint performance.
+
+Reason / Purpose:
+
+Reduce excessive log switches that were impacting performance.
+
+Improve checkpointing efficiency and minimize log file sync waits.
+
+Align redo log sizing with Oracle best practices based on current transaction volume.
+
+Ensure database stability during batch jobs and high-throughput operations.
+
+Steps Performed:
+
+Pre-Change Analysis:
+
+Analyzed alert logs and AWR reports for log switch frequency.
+
+Reviewed current redo log file sizes and count via v$log, v$logfile.
+
+Evaluated space availability on mount points or ASM diskgroups.
+
+Redo Log Configuration:
+
+Added new redo log groups with increased size (e.g., from 500MB to 2GB).
+
+Used ALTER DATABASE ADD LOGFILE GROUP commands.
+
+Ensured multiplexing for each redo log via multiple member files.
+
+Switchover & Cleanup:
+
+Performed manual log switches to make old groups inactive.
+
+Dropped older redo log groups after confirming they were inactive.
+
+Updated monitoring scripts to reflect new redo log sizes.
+
+Validation:
+
+Monitored log switch interval post-change.
+
+Checked for alert log messages or errors related to redo logs.
+
+Ran stress/load tests to confirm stability during peak activity.
+
+Verified archival and backup integration (RMAN compatibility).
+
+Challenges & Mitigation:
+
+One challenge encountered was limited space in the archive log destination after the redo size increase. This was mitigated by purging obsolete archive logs and expanding the mount point temporarily to accommodate the additional space requirements.
+
+Another issue was a temporary failure during manual log switching while deactivating old redo log groups. This was resolved by ensuring that at least one group remained active and available before attempting to drop any existing groups.
+
+There was also a minor impact on backup schedules due to changes in log file sizes. Coordination with the operations team allowed adjustments to the RMAN script timings and ensured backups continued without failures.
+
+Advantages / Benefits:
+
+Performance: Reduced log switch frequency improved DML throughput.
+
+Stability: Prevented potential database slowdowns due to log file sync waits.
+
+Scalability: Prepared the system for increased transaction volume.
+
+Outcome / Result:
+
+Redo log size increased from [Old Size] to [New Size] across [X] log groups.
+Post-change monitoring confirmed log switches reduced from [Old Frequency] to [New Frequency] per hour, with no adverse impacts reported.
+
+
+===================================================================================================
