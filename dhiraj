@@ -2,346 +2,174 @@
 <head>
     <title>Compliance Monitoring</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <!-- Bootstrap + DataTables -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
     <script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
     <script type="text/javascript" src="script/script.js"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #7b9ed9;
-            --glass-color: rgba(255, 255, 255, 0.9);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.9);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            --text-color: #2d3748;
-            --text-light: #f8f9fa;
-            --success-color: #38a169;
-            --danger-color: #e53e3e;
-            --warning-color: #dd6b20;
-            --info-color: #3182ce;
+            --primary-color: #1a73e8;
+            --secondary-color: #185abc;
+            --accent-color: #00bfa5;
+            --background-light: #f4f7fb;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-            color: var(--text-color);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(120deg, #e0f7fa, #e3f2fd, #ede7f6);
+            background-size: 300% 300%;
+            animation: gradientBG 15s ease infinite;
             margin: 0;
             padding: 0;
-            line-height: 1.5;
+            color: var(--text-dark);
         }
-        
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        /* Top header with logo */
         .top_container {
             display: flex;
-            padding: 20px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-align: center;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
             align-items: center;
-            font-size: 1.5rem;
-            position: relative;
-            z-index: 10;
-            border-radius: 0 0 12px 12px;
-        }
-        
-        .top_container a {
+            justify-content: space-between;
+            padding: 18px 30px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             color: var(--text-light);
-            margin-right: 0px;
-            margin-left: auto;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .top_container img {
+            height: 45px;
+            margin-right: 12px;
+        }
+
+        .logo-section {
             display: flex;
             align-items: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .top_container a {
+            color: var(--text-light);
+            background: var(--accent-color);
+            padding: 8px 18px;
+            border-radius: 30px;
+            text-decoration: none;
             font-size: 0.9rem;
-            font-weight: 500;
+            transition: all 0.3s ease;
         }
-        
+
         .top_container a:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
+            background: #00897b;
+            transform: translateY(-2px);
         }
-        
-        .top_container a::before {
-            content: "↓";
-            margin-right: 6px;
-        }
-        
+
+        /* Scrolling notice */
         marquee {
-            background: var(--glass-color);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            padding: 12px 20px;
+            background: var(--glass-bg);
+            padding: 12px;
             margin: 20px auto;
             width: 90%;
-            box-shadow: var(--glass-shadow);
-            color: var(--text-color);
-            font-weight: 500;
-            font-size: 1.05rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         }
-        
+
+        /* Data container */
         .middle_container {
-            margin: 2% auto;
-            width: 95%;
-            max-width: 1400px;
+            margin: 20px auto;
+            max-width: 95%;
         }
-        
+
         #data {
-            background: var(--glass-color);
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 20px;
+        }
+
+        /* Table Styling */
+        table.dataTable {
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 0;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: transparent;
-        }
-        
-        .center {
-            text-align: center;
-        }
-        
+
         th {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            color: var(--text-light) !important;
-            padding: 14px 10px !important;
-            font-weight: 600 !important;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border: none !important;
+            background: var(--primary-color) !important;
+            color: white !important;
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         td {
-            background: rgba(255, 255, 255, 0.95) !important;
-            padding: 12px 10px !important;
-            font-size: 0.85rem !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
-            color: var(--text-color);
-            vertical-align: middle;
-        }
-        
-        tr:hover td {
-            background: rgba(245, 245, 245, 0.98) !important;
-        }
-        
-        .avail {
-            color: var(--success-color) !important;
-        }
-        
-        .not-avail {
-            color: var(--danger-color) !important;
-        }
-        
-        .glyphicon {
-            font-size: 18px !important;
-            vertical-align: middle;
-        }
-        
-        #myTable_wrapper {
-            width: 100%;
-            background: transparent;
-            padding: 20px;
-        }
-        
-        .dataTables_length {
-            margin-top: 10px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-        
-        div.dt-buttons {
-            position: relative;
-            float: left;
-            margin-left: 15px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .dataTables_filter {
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .dataTables_filter label {
-            font-size: 0.9rem;
-        }
-        
-        .dataTables_filter input {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 10px;
-        }
-        
-        .buttons-html5 {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 6px 12px !important;
-            margin-right: 5px !important;
-            transition: all 0.2s ease !important;
-            font-size: 0.85rem !important;
-            font-weight: 500 !important;
-        }
-        
-        .buttons-html5:hover {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-            opacity: 0.9;
-        }
-        
-        select {
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 1px solid rgba(0, 0, 0, 0.1) !important;
-            border-radius: 6px !important;
-            padding: 6px !important;
-            margin: 5px 0 !important;
+            background: rgba(255,255,255,0.95) !important;
             font-size: 0.85rem;
         }
-        
-        tfoot {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            color: var(--text-light) !important;
+
+        tr:hover td {
+            background: rgba(230, 244, 255, 0.7) !important;
         }
-        
+
+        /* Buttons */
+        .buttons-html5 {
+            background: var(--accent-color) !important;
+            border-radius: 30px !important;
+            padding: 6px 16px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .buttons-html5:hover {
+            background: #009688 !important;
+            transform: scale(1.05);
+        }
+
+        /* Footer select filters */
         tfoot select {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 4px;
         }
-        
-        .dataTables_info {
-            color: var(--text-color) !important;
-            font-size: 0.9rem;
-        }
-        
-        .paginate_button {
-            border-radius: 6px !important;
-            margin: 0 2px !important;
-            transition: all 0.2s ease !important;
-            font-size: 0.9rem !important;
-            padding: 6px 12px !important;
-        }
-        
+
+        /* Pagination */
         .paginate_button.current {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            background: var(--primary-color) !important;
+            border-radius: 30px !important;
             color: white !important;
-            border: none !important;
-        }
-        
-        /* Modern scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Status indicators */
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        
-        .status-active {
-            background-color: var(--success-color);
-        }
-        
-        .status-inactive {
-            background-color: var(--danger-color);
-        }
-        
-        .status-warning {
-            background-color: var(--warning-color);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .top_container {
-                font-size: 1.2rem;
-                padding: 16px;
-            }
-            
-            .top_container a {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-            
-            marquee {
-                font-size: 0.95rem;
-                padding: 10px 15px;
-            }
-            
-            th, td {
-                padding: 10px 6px !important;
-                font-size: 0.8rem !important;
-            }
-            
-            #myTable_wrapper {
-                padding: 10px;
-            }
-        }
-        
-        /* Animation for status changes */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .status-change {
-            animation: pulse 0.5s ease;
-        }
-        
-        /* Zebra striping for better readability */
-        tr:nth-child(even) td {
-            background: rgba(250, 250, 250, 0.95) !important;
-        }
-        
-        /* Focus state for better accessibility */
-        a:focus, button:focus, select:focus {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container top_container">
-        <span style="flex-grow: 1; text-align: center;">PROD Compliance Monitoring Dashboard</span>
-        <a href="data/service_status.csv">Download CSV</a>
+    <div class="container-fluid top_container">
+        <div class="logo-section">
+            <img src="https://dummyimage.com/150x50/1a73e8/ffffff&text=EIS" alt="EIS Logo">
+            <span>PROD Compliance Monitoring Dashboard</span>
+        </div>
+        <a href="data/service_status.csv">⬇ Download CSV</a>
     </div>
 
     <marquee direction="left">
@@ -351,12 +179,13 @@
     <div class="container-fluid middle_container">
         <div class="row">
             <div class="col-sm-12" id="data">
-                <!-- Table will be inserted here by JavaScript -->
+                <!-- Table generated by JS -->
             </div>
         </div>
     </div>
 
-    <script>
+    <!-- Keep your existing scripts as they are -->
+<script>
         // Update refresh time
         document.getElementById('refreshTime').textContent = new Date().toLocaleString();
         
