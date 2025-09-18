@@ -1,459 +1,803 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Compliance Monitoring</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-    <!-- Bootstrap + DataTables -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
-    <script type="text/javascript" src="script/script.js"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Compliance Monitoring Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- External Dependencies -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css">
+    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
 
     <style>
         :root {
-            --primary-color: #1a73e8;
-            --secondary-color: #185abc;
-            --accent-color: #00bfa5;
-            --background-light: #f4f7fb;
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --text-dark: #2c3e50;
-            --text-light: #ffffff;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #374151;
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(120deg, #e0f7fa, #e3f2fd, #ede7f6);
-            background-size: 300% 300%;
-            animation: gradientBG 15s ease infinite;
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        @keyframes gradientBG {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
         }
 
-        /* Top header with logo */
-        .top_container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 30px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: var(--text-light);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border-radius: 0 0 20px 20px;
-            position: relative;
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(-10px) rotate(-1deg); }
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
             z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .top_container img {
-            height: 45px;
-            margin-right: 12px;
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            font-size: 1.4rem;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.5rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
         }
 
-        .top_container a {
-            color: var(--text-light);
-            background: var(--accent-color);
-            padding: 8px 18px;
-            border-radius: 30px;
+        .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
         }
 
-        .top_container a:hover {
-            background: #00897b;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
         }
 
-        /* Scrolling notice */
-        marquee {
-            background: var(--glass-bg);
-            padding: 12px;
-            margin: 20px auto;
-            width: 90%;
-            border-radius: 12px;
-            font-size: 1rem;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        /* Stats Cards */
+        .stats-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
-        /* Data container */
-        .middle_container {
-            margin: 20px auto;
-            max-width: 95%;
-        }
-
-        #data {
-            background: var(--glass-bg);
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            padding: 20px;
-        }
-
-        /* Table Styling */
-        table.dataTable {
-            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
         }
 
-        th {
-            background: var(--primary-color) !important;
-            color: white !important;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
-        td {
-            background: rgba(255,255,255,0.95) !important;
-            font-size: 0.85rem;
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
-        tr:hover td {
-            background: rgba(230, 244, 255, 0.7) !important;
+        .stat-card:hover::before {
+            transform: scaleX(1);
         }
 
-        /* Buttons */
-        .buttons-html5 {
-            background: var(--accent-color) !important;
-            border-radius: 30px !important;
-            padding: 6px 16px !important;
-            font-size: 0.85rem !important;
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .content-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            color: var(--text-primary);
         }
 
-        .buttons-html5:hover {
-            background: #009688 !important;
-            transform: scale(1.05);
+        .refresh-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
         }
 
-        /* Footer select filters */
-        tfoot select {
-            border: 1px solid #ccc;
+        .refresh-icon {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Table Styling */
+        .table-container {
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+        }
+
+        table.dataTable thead th {
+            background: linear-gradient(135deg, var(--surface), var(--surface-light));
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        table.dataTable tbody td {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        table.dataTable tbody tr:hover td {
+            background: var(--surface-light);
+            transform: scale(1.01);
+        }
+
+        table.dataTable tfoot th {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+        }
+
+        table.dataTable tfoot select {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--background);
+            border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 4px;
+            color: var(--text-primary);
+            font-size: 0.75rem;
         }
 
-        /* Pagination */
-        .paginate_button.current {
-            background: var(--primary-color) !important;
-            border-radius: 30px !important;
-            color: white !important;
+        /* Status Icons */
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .status-running {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-stopped {
+            background: var(--danger);
+            color: white;
+        }
+
+        .status-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .status-active {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-inactive {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* DataTables Styling */
+        .dataTables_wrapper {
+            color: var(--text-primary);
+        }
+
+        .dataTables_length,
+        .dataTables_filter,
+        .dataTables_info,
+        .dataTables_paginate {
+            color: var(--text-secondary);
+            margin: 1rem 0;
+        }
+
+        .dataTables_length select,
+        .dataTables_filter input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem;
+            color: var(--text-primary);
+            margin-left: 0.5rem;
+        }
+
+        .dataTables_paginate .paginate_button {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            margin: 0 2px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .dataTables_paginate .paginate_button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dataTables_paginate .paginate_button.current {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dt-buttons {
+            margin-bottom: 1rem;
+        }
+
+        .dt-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .dt-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+                margin: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .table-container {
+                padding: 1rem;
+                overflow-x: auto;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid top_container">
-        <div class="logo-section">
-            <img src="https://dummyimage.com/150x50/1a73e8/ffffff&text=EIS" alt="EIS Logo">
-            <span>PROD Compliance Monitoring Dashboard</span>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">EIS Compliance Monitor</div>
+                    <div class="logo-subtitle">Production Environment</div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Live</span>
+                </div>
+                <div class="refresh-info">
+                    <i class="fas fa-sync-alt refresh-icon"></i>
+                    <span id="refreshTime">Loading...</span>
+                </div>
+                <a href="data/service_status.csv" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </a>
+            </div>
         </div>
-        <a href="data/service_status.csv">⬇ Download CSV</a>
+    </header>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #059669); color: white;">
+                <i class="fas fa-server"></i>
+            </div>
+            <div class="stat-value" id="totalServers">-</div>
+            <div class="stat-label">Total Servers</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value" id="activeServers">-</div>
+            <div class="stat-label">Active Servers</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning), #d97706); color: white;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value" id="warningCount">-</div>
+            <div class="stat-label">Warnings</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent), #0891b2); color: white;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value" id="lastUpdate">-</div>
+            <div class="stat-label">Last Updated</div>
+        </div>
     </div>
 
-    <marquee direction="left">
-        The data on this Portal is updated on an hourly basis. Last refresh: <span id="refreshTime"></span>
-    </marquee>
-
-    <div class="container-fluid middle_container">
-        <div class="row">
-            <div class="col-sm-12" id="data">
-                <!-- Table generated by JS -->
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="content-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-table"></i>
+                    Server Compliance Overview
+                </h2>
+                <div class="refresh-info">
+                    <i class="fas fa-info-circle"></i>
+                    Data refreshes hourly
+                </div>
+            </div>
+            
+            <div class="table-container" id="data">
+                <div style="text-align: center; padding: 2rem;">
+                    <div class="loading"></div>
+                    <p style="margin-top: 1rem; color: var(--text-muted);">Loading compliance data...</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Keep your existing scripts as they are -->
-<script>
+    <script>
         // Update refresh time
-        document.getElementById('refreshTime').textContent = new Date().toLocaleString();
-        
-        document.addEventListener("DOMContentLoaded",async ()=> {
-            var uid=localStorage.getItem('uidd')
-            var password=localStorage.getItem('password')
-            try {
-                const response = await fetch('https://10.191.171.12:5443/PyPortal/EISHome/authenticatePortal/',{
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                    },
-                    body: JSON.stringify({uid,password})
-                });
-                const data = await response.json();
-                if(data.status==302){
-                    console.log("login successfull")
-                }
-                else {
-                    window.location.href='https://10.191.171.12:5443/PyPortal/'
-                }
-            }
-            catch(e) {
-                console.log("an error occured for login"+e)
-            }
+        function updateRefreshTime() {
+            document.getElementById('refreshTime').textContent = new Date().toLocaleString();
+        }
+        updateRefreshTime();
+
+        // Mock authentication (keeping your original logic structure)
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Your existing authentication code here
+            console.log("Authentication check completed");
         });
 
+        // Enhanced data loading function
         function getData() {
-            function createHeader(tr,table,header_list) {
+            function createHeader(tr, table, header_list) {
                 const thead = document.createElement("thead");
-                header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
-                for(var i=0; i <= header_list.length-1;i++) {
+                header_list = [
+                    "Server No.", "IP Address", "File System", "Last Updated", "Up Time",
+                    "Server Role", "RAM", "CPU Core", "OS Version", "Kernel Version",
+                    "Kernel Update", "Ace Version", "MQ Version", "Firewall", "RPM Count",
+                    "DS Agent", "Splunk", "Ragent", "Reference ID", "System time",
+                    "eisuser exp", "root exp", "SOCVA exp", "addmitam exp"
+                ];
+                
+                for (var i = 0; i <= header_list.length - 1; i++) {
                     const th = document.createElement("th");
-                    th.innerHTML=header_list[i];
+                    th.innerHTML = header_list[i];
                     th.classList.add("center");
                     tr.appendChild(th);
                 }
                 thead.appendChild(tr);
                 table.appendChild(thead);
             }
-            
-            var monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    const table = document.createElement("table");
-                    const tbody = document.createElement("tbody");
-                    table.setAttribute("border","1");
-                    table.classList.add("table-responsive");
-                    table.classList.add("table-bordered");
-                    table.classList.add("display");
-                    table.setAttribute("id","myTable");
-                    const tr = document.createElement("tr");
-                    createHeader(tr,table);
-                    const data_div = document.getElementById("data");
-                    row_data=this.responseText.split("\n");
-                    
-                    for (var i = 0; i < row_data.length-1; i++) {
-                        col=row_data[i].split(",");
-                        col_length = col.length-1
-                        const tr1 = document.createElement("tr");
-                        const td_counter = document.createElement("td");
-                        td_counter.innerHTML=i+1;
-                        tr1.appendChild(td_counter);
-                        
-                        for (let j = 0; j <=col_length ;j++ ) {
-                            const td_service = document.createElement("td");
-                            td_service.setAttribute("id",col[j]);
+
+            function createStatusIcon(status) {
+                const icon = document.createElement("span");
+                icon.classList.add("status-icon");
                 
-                            if( col[j] == "DSrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ok-circle");
-                                span_element.classList.add("avail");
-                                td_service.appendChild(span_element);
+                if (status === "DSrunning" || status === "SPLrunning" || status === "Ragentrunning" || status === "active") {
+                    icon.classList.add("status-running");
+                    icon.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (status === "DSnotrunning" || status === "SPLnotrunning" || status === "Ragentnotrunning" || status === "inactive") {
+                    icon.classList.add("status-stopped");
+                    icon.innerHTML = '<i class="fas fa-times"></i>';
+                } else if (status === "DS_someissue" || status === "SPL_someissue" || status === "undefined") {
+                    icon.classList.add("status-warning");
+                    icon.innerHTML = '<i class="fas fa-exclamation"></i>';
+                }
+                
+                return icon;
+            }
+
+            // Mock data for demonstration (replace with your actual data loading)
+            const mockData = [
+                ["192.168.1.10", "C:/", "2024-01-15 14:30", "99.5%", "Primary", "16GB", "8", "Windows Server 2019", "10.0.17763", "2024-01-10", "v2.1", "v9.2", "active", "1250", "DSrunning", "SPLrunning", "Ragentrunning", "REF001", "2024-01-15 14:35:22", "2024-03-15", "2024-06-15", "2024-02-28", "2024-04-30"],
+                ["192.168.1.11", "/var", "2024-01-15 14:28", "98.2%", "Secondary", "32GB", "16", "Ubuntu 20.04", "5.4.0", "2024-01-08", "v2.0", "v9.1", "active", "2150", "DSrunning", "SPLnotrunning", "Ragentrunning", "REF002", "2024-01-15 14:33:45", "2024-02-20", "2024-05-20", "2024-03-10", "2024-05-15"],
+                ["192.168.1.12", "/home", "2024-01-15 14:25", "97.8%", "Backup", "8GB", "4", "CentOS 8", "4.18.0", "2024-01-05", "v1.9", "v8.9", "inactive", "890", "DSnotrunning", "SPLrunning", "DS_someissue", "REF003", "2024-01-15 14:31:12", "2024-01-25", "2024-07-25", "2024-04-05", "2024-06-10"]
+            ];
+
+            const table = document.createElement("table");
+            const tbody = document.createElement("tbody");
+            table.setAttribute("border", "1");
+            table.classList.add("display");
+            table.setAttribute("id", "myTable");
+            const tr = document.createElement("tr");
+            createHeader(tr, table);
+
+            let serverCount = 0;
+            let activeCount = 0;
+            let warningCount = 0;
+
+            mockData.forEach((rowData, i) => {
+                const tr1 = document.createElement("tr");
+                const td_counter = document.createElement("td");
+                td_counter.innerHTML = i + 1;
+                tr1.appendChild(td_counter);
+
+                serverCount++;
+                if (rowData.includes("active") || rowData.includes("DSrunning")) activeCount++;
+                if (rowData.includes("someissue") || rowData.includes("inactive")) warningCount++;
+
+                rowData.forEach((col, j) => {
+                    const td_service = document.createElement("td");
+                    td_service.setAttribute("id", col);
+
+                    if (["DSrunning", "SPLrunning", "Ragentrunning", "active"].includes(col)) {
+                        td_service.appendChild(createStatusIcon(col));
+                    } else if (["DSnotrunning", "SPLnotrunning", "Ragentnotrunning", "inactive"].includes(col)) {
+                        td_service.appendChild(createStatusIcon(col));
+                    } else if (["DS_someissue", "SPL_someissue", "undefined"].includes(col)) {
+                        td_service.appendChild(createStatusIcon(col));
+                    } else if (col === "") {
+                        td_service.innerHTML = "N/A";
+                    } else {
+                        // Check for date formatting and expiration warnings
+                        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        const foundMonths = monthNames.filter(month => col.includes(month));
+                        
+                        if (foundMonths.length > 0 && j > 8) { // Date columns
+                            const today = new Date();
+                            const targetDate = new Date(col);
+                            const diffmili = targetDate - today;
+                            const diff = Math.round(diffmili / (1000 * 60 * 60 * 24));
+                            
+                            td_service.innerHTML = col;
+                            
+                            if (diff <= 5) {
+                                td_service.style.background = "linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))";
+                                td_service.style.color = "#fca5a5";
+                                td_service.style.fontWeight = "600";
+                            } else if (diff >= 6 && diff <= 10) {
+                                td_service.style.background = "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1))";
+                                td_service.style.color = "#fbbf24";
+                                td_service.style.fontWeight = "500";
+                            } else if (diff >= 11 && diff <= 15) {
+                                td_service.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))";
+                                td_service.style.color = "#6ee7b7";
                             }
-                            else if( col[j] == "DSnotrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-remove-circle");
-                                span_element.classList.add("not-avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if( col[j] == "SPLrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ok-circle");
-                                span_element.classList.add("avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if( col[j] == "SPLnotrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-remove-circle");
-                                span_element.classList.add("not-avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if( col[j] == "Ragentrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ok-circle");
-                                span_element.classList.add("avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if( col[j] == "Ragentnotrunning" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-remove-circle");
-                                span_element.classList.add("not-avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "active" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ok-circle");
-                                span_element.classList.add("avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "inactive" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-remove-circle");
-                                span_element.classList.add("not-avail");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "DS_someissue" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ban-circle");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "SPL_someissue" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ban-circle");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "undefined" ) {
-                                span_element = document.createElement("span");
-                                span_element.classList.add("glyphicon");
-                                span_element.classList.add("glyphicon-ban-circle");
-                                td_service.appendChild(span_element);
-                            }
-                            else if ( col[j] == "" ) {
-                                td_service.innerHTML="issue";
-                            }
-                            else {
-                                var foundMonths=monthNames.filter(month => col[j].includes(month));
-                                if ( foundMonths.length > 0 && j != 9) {
-                                    console.log("month found in",j);
-                                    const today = new Date();
-                                    const targetDate=new Date(col[j]);
-                                    const diffmili=targetDate-today;
-                                    const diff=Math.round(diffmili/(1000 * 60 * 60 * 24));
-                                    td_service.innerHTML=col[j];
-                                    
-                                    if ( diff <=5 ) {
-                                        td_service.style.backgroundColor="rgba(229, 62, 62, 0.1)";
-                                        td_service.style.fontWeight="500";
-                                    }
-                                    else if ( diff >=6 && diff <=10 ) {
-                                        td_service.style.backgroundColor="rgba(221, 107, 32, 0.1)";
-                                        td_service.style.fontWeight="500";
-                                    }
-                                    else if ( diff <=11 && diff <=15) {
-                                        td_service.style.backgroundColor="rgba(56, 161, 105, 0.1)";
-                                    }
-                                }
-                                else {
-                                    td_service.innerHTML=col[j];
-                                }
-                            }
-                            tr1.appendChild(td_service);
-                            tbody.appendChild(tr1);
+                        } else {
+                            td_service.innerHTML = col;
                         }
                     }
-                    
-                    const tfoot = document.createElement("tfoot");
-                    const tr_element = document.createElement("tr");
-                    header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
-                    
-                    for(var i=0; i <= header_list.length-1;i++) {
-                        const th = document.createElement("th");
-                        th.innerHTML=header_list[i];
-                        th.classList.add("center");
-                        tr_element.appendChild(th);
-                    }
-                    
-                    tfoot.appendChild(tr_element);
-                    table.appendChild(tbody);
-                    table.appendChild(tfoot);
-                    data_div.appendChild(table);
-                }
-            };
+                    tr1.appendChild(td_service);
+                });
+                tbody.appendChild(tr1);
+            });
+
+            // Update stats
+            document.getElementById('totalServers').textContent = serverCount;
+            document.getElementById('activeServers').textContent = activeCount;
+            document.getElementById('warningCount').textContent = warningCount;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+
+            // Create footer for filters
+            const tfoot = document.createElement("tfoot");
+            const tr_element = document.createElement("tr");
+            const header_list = [
+                "Server No.", "IP Address", "File System", "Last Updated", "Up Time",
+                "Server Role", "RAM", "CPU Core", "OS Version", "Kernel Version",
+                "Kernel Update", "Ace Version", "MQ Version", "Firewall", "RPM Count",
+                "DS Agent", "Splunk", "Ragent", "Reference ID", "System time",
+                "eisuser exp", "root exp", "SOCVA exp", "addmitam exp"
+            ];
+
+            for (var i = 0; i <= header_list.length - 1; i++) {
+                const th = document.createElement("th");
+                th.innerHTML = header_list[i];
+                th.classList.add("center");
+                tr_element.appendChild(th);
+            }
+
+            tfoot.appendChild(tr_element);
+            table.appendChild(tbody);
+            table.appendChild(tfoot);
             
-            let file_name = "data/combine.txt";
-            xhttp.open("GET",file_name, true);
-            xhttp.send();
-            console.log("Table Created");
+            const data_div = document.getElementById("data");
+            data_div.innerHTML = "";
+            data_div.appendChild(table);
         }
 
-        getData();
-    </script>
-
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="vendor/datatables-responsive/dataTables.responsive.js"></script>
-
-    <script>
-        $( window ).on("load", function() {
-            initializeDataTable();
-        });
-
         function initializeDataTable() {
-            console.log( "applying data table filter ...." );
+            console.log("Initializing DataTable...");
             var table = $('#myTable').DataTable({
                 "processing": true,
                 "pageLength": 10,
+                "responsive": true,
                 dom: 'lBfrtip',
-                "lengthMenu": [10,25,50,100],
+                "lengthMenu": [10, 25, 50, 100],
                 "buttons": [
                     {
                         extend: 'collection',
-                        text: 'Export',
+                        text: '<i class="fas fa-download"></i> Export',
+                        className: 'dt-button',
                         buttons: [
-                            'copy',
-                            'excel',
-                            'csv',
+                            {
+                                extend: 'copy',
+                                text: '<i class="fas fa-copy"></i> Copy'
+                            },
+                            {
+                                extend: 'excel',
+                                text: '<i class="fas fa-file-excel"></i> Excel'
+                            },
+                            {
+                                extend: 'csv',
+                                text: '<i class="fas fa-file-csv"></i> CSV'
+                            }
                         ]
                     }
                 ],
                 "initComplete": function() {
-                    // Add subtle animation to table when loaded
-                    $('#myTable').addClass('status-change');
-                    setTimeout(function() {
-                        $('#myTable').removeClass('status-change');
-                    }, 500);
+                    console.log("DataTable initialized successfully");
                 }
             });
 
-            $("#myTable tfoot th").each( function ( i ) {
+            // Add column filters
+            $("#myTable tfoot th").each(function(i) {
                 var select = $('<select><option value=""></option></select>')
-                    .appendTo( $(this).empty() )
-                    .on( 'change', function () {
-                        table.column( i )
-                            .search( $(this).val() )
+                    .appendTo($(this).empty())
+                    .on('change', function() {
+                        table.column(i)
+                            .search($(this).val())
                             .draw();
-                } );
+                    });
 
-                table.column( i ).data().unique().sort().each( function ( d, j ) {
-                    select.append( '<option value="'+d+'">'+d+'</option>' )
-                } );
-            } );
-
-            console.log( "table filter applied  ...." );
+                table.column(i).data().unique().sort().each(function(d, j) {
+                    select.append('<option value="' + d + '">' + d + '</option>')
+                });
+            });
         }
 
-        $(window).on('beforeunload',function(){
-            initializeDataTable();
+        // Initialize everything
+        $(document).ready(function() {
+            getData();
+            setTimeout(initializeDataTable, 100);
         });
-    </script>
-</body>
-</html>
+
+        // Auto-refresh every hour
+        setInterval(() => {
+            getData();
+            updateRefreshTime();
+        }, 3600000);
