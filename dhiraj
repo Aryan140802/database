@@ -1,832 +1,1323 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Compliance Monitoring Dashboard</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- External Dependencies -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css">
-    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+<html>
 
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --accent: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --background: #0f172a;
-            --surface: #1e293b;
-            --surface-light: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --border: #374151;
-            --glass: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(148, 163, 184, 0.2);
-        }
+        <head>
+                <title>
+                        Compliance Monitoring
+                </title>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
 
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
-            z-index: -1;
-            animation: float 20s ease-in-out infinite;
-        }
+        </head>
+        <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="vendor/datatables/css/jquery.dataTables.css">-->
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(1deg); }
-            66% { transform: translateY(-10px) rotate(-1deg); }
-        }
 
-        /* Header */
-        .header {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1.5rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="./authentication.js"></script>
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
-        }
+<script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
+<script type="text/javascript" src="script/script.js"></script>
 
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.025em;
-        }
-
-        .logo-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--surface);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-size: 0.875rem;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: 500;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
-        }
-
-        /* Stats Cards */
-        .stats-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        /* Main Content */
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .content-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .refresh-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .refresh-icon {
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Table Styling */
-        .table-container {
-            padding: 2rem;
-            overflow: hidden;
-        }
-
-        table.dataTable {
-            width: 100% !important;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-        }
-
-        table.dataTable thead th {
-            background: linear-gradient(135deg, var(--surface), var(--surface-light));
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            padding: 1rem 0.75rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            position: relative;
-        }
-
-        table.dataTable tbody td {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 1rem 0.75rem;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        table.dataTable tbody tr:hover td {
-            background: var(--surface-light);
-            transform: scale(1.01);
-        }
-
-        table.dataTable tfoot th {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 0.5rem;
-        }
-
-        table.dataTable tfoot select {
-            width: 100%;
-            padding: 0.5rem;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 0.75rem;
-        }
-
-        /* Status Icons */
-        .status-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-        }
-
-        .status-running {
-            background: var(--success);
-            color: white;
-        }
-
-        .status-stopped {
-            background: var(--danger);
-            color: white;
-        }
-
-        .status-warning {
-            background: var(--warning);
-            color: white;
-        }
-
-        .status-active {
-            background: var(--success);
-            color: white;
-        }
-
-        .status-inactive {
-            background: var(--danger);
-            color: white;
-        }
-
-        /* DataTables Styling */
-        .dataTables_wrapper {
-            color: var(--text-primary);
-        }
-
-        .dataTables_length,
-        .dataTables_filter,
-        .dataTables_info,
-        .dataTables_paginate {
-            color: var(--text-secondary);
-            margin: 1rem 0;
-        }
-
-        .dataTables_length select,
-        .dataTables_filter input {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.5rem;
-            color: var(--text-primary);
-            margin-left: 0.5rem;
-        }
-
-        .dataTables_paginate .paginate_button {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            margin: 0 2px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .dataTables_paginate .paginate_button:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .dataTables_paginate .paginate_button.current {
-            background: var(--primary);
-            color: white;
-        }
-
-        .dt-buttons {
-            margin-bottom: 1rem;
-        }
-
-        .dt-button {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            margin-right: 0.5rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .dt-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .stats-container {
-                grid-template-columns: 1fr;
-                margin: 1rem;
-                padding: 0 1rem;
-            }
-            
-            .main-container {
-                padding: 1rem;
-            }
-            
-            .table-container {
-                padding: 1rem;
-                overflow-x: auto;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="logo-text">
-                    <div class="logo-title">EIS Compliance Monitor</div>
-                    <div class="logo-subtitle">Production Environment</div>
-                </div>
-            </div>
-            
-            <div class="header-actions">
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
-                    <span>Live</span>
-                </div>
-                <div class="refresh-info">
-                    <i class="fas fa-sync-alt refresh-icon"></i>
-                    <span id="refreshTime">Loading...</span>
-                </div>
-                <a href="data/service_status.csv" class="btn btn-primary">
-                    <i class="fas fa-download"></i>
-                    Export CSV
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Stats Dashboard -->
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #059669); color: white;">
-                <i class="fas fa-server"></i>
-            </div>
-            <div class="stat-value" id="totalServers">-</div>
-            <div class="stat-label">Total Servers</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-value" id="activeServers">-</div>
-            <div class="stat-label">Active Servers</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning), #d97706); color: white;">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-value" id="warningCount">-</div>
-            <div class="stat-label">Warnings</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--accent), #0891b2); color: white;">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-value" id="lastUpdate">-</div>
-            <div class="stat-label">Last Updated</div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-container">
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-table"></i>
-                    Server Compliance Overview
-                </h2>
-                <div class="refresh-info">
-                    <i class="fas fa-info-circle"></i>
-                    Data refreshes hourly
-                </div>
-            </div>
-            
-            <div class="table-container" id="data">
-                <div style="text-align: center; padding: 2rem;">
-                    <div class="loading"></div>
-                    <p style="margin-top: 1rem; color: var(--text-muted);">Loading compliance data...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Update refresh time
-        function updateRefreshTime() {
-            document.getElementById('refreshTime').textContent = new Date().toLocaleString();
-        }
-        updateRefreshTime();
-
-        // Authentication check
-        document.addEventListener("DOMContentLoaded", async () => {
-            var uid = localStorage.getItem('uidd');
-            var password = localStorage.getItem('password');
-            
-            try {
-                const response = await fetch('https://10.191.171.12:5443/PyPortal/EISHome/authenticatePortal/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ uid, password })
-                });
-                
-                const data = await response.json();
-                if (data.status == 302) {
-                    console.log("Login successful");
-                    // Load data after successful authentication
-                    getData();
-                } else {
-                    window.location.href = 'https://10.191.171.12:5443/PyPortal/';
+        <style>
+                .top_container
+                {
+                    display: flex;
+                    padding: 15px 20px;
+                    font-weight: 700;
+                    color: #fff;
+                    text-align: center;
+                    background-color: #0275d8;
+                    #width:100%;
                 }
-            } catch(e) {
-                console.log("An error occurred during login: " + e);
-                // For demo purposes, load data even if auth fails
-                getData();
-            }
+                .middle_container
+                {
+                    margin-top:1%;
+                    #border:2px solid #d8d8e5;
+                    #overflow-x:auto;
+                }
+                .box
+                {
+                        #border:2px solid #f0f0ff;
+                        border:4px solid #f0f0ff;
+                        background:#ffffff;
+                        //text-align:center;
+                        overflow:hidden;
+                        padding:0;
+
+                }
+                body
+                {
+                        background:#f0f0ff;
+                }
+                table
+                {
+                        width:100%;
+                        border:1px solid #f0f0ff;
+                        padding:1%;
+
+                }
+                .center
+                {
+                        text-align:center;
+                }
+                td,th
+                {
+                        background:#ffffff;
+                        text-align:center;
+                        padding:5;
+                        font-size:12px;
+
+                }
+
+                .avail
+                {
+                        color:green;
+
+                }
+                .not-avail
+                {
+                        color:red;
+                }
+                .glyphicon
+                {
+                        font-size:24px;
+                }
+                #myTable_wrapper{
+                        width:100%;
+
+                }
+
+
+
+
+
+
+
+
+                 .dataTables_length {
+                        margin-top:50px;
+                  }
+                  div.dt-buttons {
+                    position: relative;
+                    float: left;
+                    margin-left: 20px;
+                    margin-top:12px;
+                    font-size:16px;
+                    font-weight:bold;
+                    margin-bottom:10px;
+                 }
+                 .dataTables_filter {
+                         margin-top:20px;
+                 }
+                 .buttons-html5{
+                        width:100%;
+                }
+
+
+
+        </style>
+
+        <body>
+                <div class="container top_container">
+                        PROD Compliance Monitoring
+                        <a href="data/service_status.csv" style="color:white;margin-right:0px;margin-left:auto;"> Download </a>
+                </div>
+
+                <marquee direction="left" style="margin-top:1%;font-size: 150%;">
+                        The data on this Portal is updated on an hourly basis.
+                </marquee>
+
+
+                <div class="container-fluid middle_container" style="text-align:center;width:95%;">
+                        <div class="row">
+                                <div class="col-sm-1o" id="data">
+                                        <!--<table id="myTable">
+                                        </table> -->
+                                </div>
+
+
+                        </div>
+
+
+
+                </div>
+
+
+                <script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const uid = localStorage.getItem('uidd');
+    const sessionId = localStorage.getItem('sessionid');
+
+    if (!uid || !sessionId) {
+        console.log("No auth tokens - redirecting to login");
+        redirectToLogin();
+        return;
+    }
+
+    try {
+        const response = await fetch('https://10.191.171.12:5443/EISHOME/awthenticationService/authenticatePortal/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionId}`
+            },
+            body: JSON.stringify({ uid })
         });
 
-        // Enhanced data loading function
-        function getData() {
-            function createHeader(tr, table, header_list) {
-                const thead = document.createElement("thead");
-                header_list = [
-                    "Server No.", "IP Address", "File System", "Last Updated", "Up Time",
-                    "Server Role", "RAM", "CPU Core", "OS Version", "Kernel Version",
-                    "Kernel Update", "Ace Version", "MQ Version", "Firewall", "RPM Count",
-                    "DS Agent", "Splunk", "Ragent", "Reference ID", "System time",
-                    "eisuser exp", "root exp", "SOCVA exp", "addmitam exp"
-                ];
-                
-                for (var i = 0; i <= header_list.length - 1; i++) {
-                    const th = document.createElement("th");
-                    th.innerHTML = header_list[i];
-                    th.classList.add("center");
-                    tr.appendChild(th);
-                }
-                thead.appendChild(tr);
-                table.appendChild(thead);
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-            function createStatusIcon(status) {
-                const icon = document.createElement("span");
-                icon.classList.add("status-icon");
-                
-                if (status === "DSrunning" || status === "SPLrunning" || status === "Ragentrunning" || status === "active") {
-                    icon.classList.add("status-running");
-                    icon.innerHTML = '<i class="fas fa-check"></i>';
-                } else if (status === "DSnotrunning" || status === "SPLnotrunning" || status === "Ragentnotrunning" || status === "inactive") {
-                    icon.classList.add("status-stopped");
-                    icon.innerHTML = '<i class="fas fa-times"></i>';
-                } else if (status === "DS_someissue" || status === "SPL_someissue" || status === "undefined") {
-                    icon.classList.add("status-warning");
-                    icon.innerHTML = '<i class="fas fa-exclamation"></i>';
-                }
-                
-                return icon;
-            }
+        const data = await response.json();
+        console.log("Auth response:", data);
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    const table = document.createElement("table");
-                    const tbody = document.createElement("tbody");
-                    table.setAttribute("border", "1");
-                    table.classList.add("display");
-                    table.setAttribute("id", "myTable");
-                    const tr = document.createElement("tr");
-                    createHeader(tr, table);
+        if (data.status === 302 || data.success === true) {
+            console.log("Authentication successful");
+            // Continue with app
+        } else {
+            console.log("Authentication failed - redirecting");
+            redirectToLogin();
+        }
+    } catch (error) {
+        console.error("Auth error:", error);
+        redirectToLogin();
+    }
+});
 
-                    let serverCount = 0;
-                    let activeCount = 0;
-                    let warningCount = 0;
+function redirectToLogin() {
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `https://10.191.171.12:5443/EISHOME/?return_url=${currentUrl}`;
+}
 
-                    const row_data = this.responseText.split("\n");
-                    for (var i = 0; i < row_data.length - 1; i++) {
-                        const col = row_data[i].split(",");
-                        const col_length = col.length - 1;
-                        const tr1 = document.createElement("tr");
-                        const td_counter = document.createElement("td");
-                        td_counter.innerHTML = i + 1;
-                        tr1.appendChild(td_counter);
 
-                        serverCount++;
-                        
-                        for (let j = 0; j <= col_length; j++) {
-                            const td_service = document.createElement("td");
-                            td_service.setAttribute("id", col[j]);
-                            
-                            if (col[j] == "DSrunning" || col[j] == "SPLrunning" || col[j] == "Ragentrunning" || col[j] == "active") {
-                                td_service.appendChild(createStatusIcon(col[j]));
-                                if (col[j] == "active" || col[j] == "DSrunning") activeCount++;
-                            } else if (col[j] == "DSnotrunning" || col[j] == "SPLnotrunning" || col[j] == "Ragentnotrunning" || col[j] == "inactive") {
-                                td_service.appendChild(createStatusIcon(col[j]));
-                                warningCount++;
-                            } else if (col[j] == "DS_someissue" || col[j] == "SPL_someissue" || col[j] == "undefined") {
-                                td_service.appendChild(createStatusIcon(col[j]));
-                                warningCount++;
-                            } else if (col[j] == "") {
-                                td_service.innerHTML = "N/A";
-                            } else {
-                                // Check for date formatting and expiration warnings
-                                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                                const foundMonths = monthNames.filter(month => col[j].includes(month));
-                                
-                                if (foundMonths.length > 0 && j != 9) {
-                                    const today = new Date();
-                                    const targetDate = new Date(col[j]);
-                                    const diffmili = targetDate - today;
-                                    const diff = Math.round(diffmili / (1000 * 60 * 60 * 24));
-                                    
-                                    td_service.innerHTML = col[j];
-                                    
-                                    if (diff <= 5) {
-                                        td_service.style.background = "linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))";
-                                        td_service.style.color = "#fca5a5";
-                                        td_service.style.fontWeight = "600";
-                                    } else if (diff >= 6 && diff <= 10) {
-                                        td_service.style.background = "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1))";
-                                        td_service.style.color = "#fbbf24";
-                                        td_service.style.fontWeight = "500";
-                                    } else if (diff >= 11 && diff <= 15) {
-                                        td_service.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1))";
-                                        td_service.style.color = "#6ee7b7";
-                                    }
-                                } else {
-                                    td_service.innerHTML = col[j];
+
+
+                        function getData()
+                        {
+
+                          function createHeader(tr,table,header_list)
+                          {
+                                const thead = document.createElement("thead");
+
+                                header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                                for(var i=0; i <= header_list.length-1;i++)
+                                {
+                                        //console.log(header_list[i]);
+                                        const th = document.createElement("th");
+                                        th.innerHTML=header_list[i];
+                                        th.classList.add("center");
+                                        tr.appendChild(th);
+
                                 }
-                            }
-                            tr1.appendChild(td_service);
+
+                                thead.appendChild(tr);
+                                table.appendChild(thead);
+
+
+                          }
+                          var monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                          var xhttp = new XMLHttpRequest();
+                          xhttp.onreadystatechange = function()
+                          {
+                                if (this.readyState == 4 && this.status == 200)
+                                {
+                                        const table = document.createElement("table");
+                                        //const table  = document.getElementById("myTable");
+                                        const tbody = document.createElement("tbody");
+                                        table.setAttribute("border","1");
+                                        table.classList.add("table-responsive");
+                                        table.classList.add("table-bordered");
+                                        table.classList.add("display");
+
+                                        table.setAttribute("id","myTable");
+                                        const tr = document.createElement("tr");
+
+                                        createHeader(tr,table);
+
+                                        const data_div = document.getElementById("data");
+
+                                        /*
+                                        const tr = document.createElement("tr");
+                                        const td = document.createElement("td");
+                                        const td1 = document.createElement("td");
+                                        const td2 = document.createElement("td");
+                                        const td3 = document.createElement("td");
+
+                                        //const td4 = document.createElement("td");
+                                        table.setAttribute("border","1");
+
+                                        table.classList.add("table-responsive");
+                                        table.classList.add("table-bordered");
+                                        //const data_div = document.getElementById("data");
+
+                                        console.log("all ok");
+                                        td.innerHTML="&nbsp &nbsp";
+                                        td1.innerHTML="DS Agent";
+                                        td2.innerHTML="Splunk Status";
+                                        td3.innerHTML="Imperva Status";
+
+                                        td.classList.add("center");
+
+                                        td1.classList.add("center");
+                                        td2.classList.add("center");
+
+                                        td3.classList.add("center");
+                                        tr.appendChild(td);
+                                        tr.appendChild(td1);
+                                        tr.appendChild(td2);
+
+                                        tr.appendChild(td3);
+
+
+                                        table.appendChild(tr);*/
+                                        //data_div.appendChild(table);
+
+                                        row_data=this.responseText.split("\n");
+                                        for (var i = 0; i < row_data.length-1; i++)
+                                        {
+                                                col=row_data[i].split(",");
+                                                col_length = col.length-1
+                                                const tr1 = document.createElement("tr");
+                                                const td_counter = document.createElement("td");
+                                                td_counter.innerHTML=i+1;
+                                                tr1.appendChild(td_counter);
+                                                for (let j = 0; j <=col_length ;j++ )
+                                                {
+                                                        //console.log(j," ",col[j]);
+                                                        const td_service = document.createElement("td");
+                                                        td_service.setAttribute("id",col[j]);
+                                                        if( col[j] == "DSrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if( col[j] == "DSnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+
+                                                        else if( col[j] == "SPLrunning" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+                                                         else if( col[j] == "SPLnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if( col[j] == "Ragentrunning" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+                                                         else if( col[j] == "Ragentnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if ( col[j] == "active" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+                                                        else if ( col[j] == "inactive" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+                                                        else if ( col[j] == "DS_someissue" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+                                                        else if ( col[j] == "SPL_someissue" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+
+
+
+
+
+                                                        else if ( col[j] == "undefined" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+                                                                td_service.appendChild(span_element);
+                                                        }
+
+
+                                                        else if ( col[j] == "" )
+                                                        {
+                                                                //col[j] == "issue while fetching data";
+                                                                td_service.innerHTML="issue";
+                                                        }
+
+                                                        else
+                                                        {
+                                                                //<span class="glyphicon glyphicon-remove-circle"></span>
+                                                                var foundMonths=monthNames.filter(month => col[j].includes(month));
+                                                                if ( foundMonths.length > 0 && j != 9)
+                                                                {
+                                                                        console.log("month found in",j);
+                                                                        const today = new Date();
+                                                                        const targetDate=new Date(col[j]);
+                                                                        const diffmili=targetDate-today;
+                                                                        const diff=Math.round(diffmili/(1000 * 60 * 60 * 24));
+                                                                        td_service.innerHTML=col[j];
+
+                                                                        if ( diff <=5 )
+                                                                        {
+                                                                                td_service.style.backgroundColor="red";
+                                                                        }
+                                                                        else if ( diff >=6 && diff <=10 )
+                                                                        {
+
+                                                                                td_service.style.backgroundColor="orange";
+                                                                        }
+                                                                        else if ( diff <=11 && diff <=15)
+                                                                        {
+
+                                                                                td_service.style.backgroundColor="yellow";
+
+
+                                                                        }
+
+                                                                }
+                                                                else
+                                                                {
+
+
+                                                                        td_service.innerHTML=col[j];
+                                                                        //console.log("print case");
+                                                                }
+                                                        }
+                                                        tr1.appendChild(td_service);
+                                                        tbody.appendChild(tr1);
+                                                }
+
+                                        }
+                                        const tfoot = document.createElement("tfoot");
+                                        const tr_element = document.createElement("tr");
+
+                                        header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                                        for(var i=0; i <= header_list.length-1;i++)
+                                        {
+                                                //console.log(header_list[i]);
+                                                const th = document.createElement("th");
+                                                th.innerHTML=header_list[i];
+                                                th.classList.add("center");
+                                                tr_element.appendChild(th);
+
+                                        }
+                                        tfoot.appendChild(tr_element);
+
+
+
+
+                                        table.appendChild(tbody);
+                                         table.appendChild(tfoot);
+                                        data_div.appendChild(table);
+
+
+
+
+                                }
+                          };
+                          let file_name = "data/combine.txt";
+                          xhttp.open("GET",file_name, true);
+                          xhttp.send();
+                          console.log("Table Created");
                         }
-                        tbody.appendChild(tr1);
-                    }
 
-                    // Update stats
-                    document.getElementById('totalServers').textContent = serverCount;
-                    document.getElementById('activeServers').textContent = activeCount;
-                    document.getElementById('warningCount').textContent = warningCount;
-                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
 
-                    // Create footer for filters
-                    const tfoot = document.createElement("tfoot");
-                    const tr_element = document.createElement("tr");
-                    const header_list = [
-                        "Server No.", "IP Address", "File System", "Last Updated", "Up Time",
-                        "Server Role", "RAM", "CPU Core", "OS Version", "Kernel Version",
-                        "Kernel Update", "Ace Version", "MQ Version", "Firewall", "RPM Count",
-                        "DS Agent", "Splunk", "Ragent", "Reference ID", "System time",
-                        "eisuser exp", "root exp", "SOCVA exp", "addmitam exp"
-                    ];
+                                getData();
+                </script>
 
-                    for (var i = 0; i <= header_list.length - 1; i++) {
-                        const th = document.createElement("th");
-                        th.innerHTML = header_list[i];
-                        th.classList.add("center");
-                        tr_element.appendChild(th);
-                    }
+                 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
+                <script type="text/javascript" charset="utf8" src="vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+                <script type="text/javascript" charset="utf8" src="vendor/datatables-responsive/dataTables.responsive.js"></script>
 
-                    tfoot.appendChild(tr_element);
-                    table.appendChild(tbody);
-                    table.appendChild(tfoot);
-                    
-                    const data_div = document.getElementById("data");
-                    data_div.innerHTML = "";
-                    data_div.appendChild(table);
-                    
-                    // Initialize DataTable
-                    setTimeout(initializeDataTable, 100);
-                }
-            };
-            
-            let file_name = "data/combine.txt";
-            xhttp.open("GET", file_name, true);
-            xhttp.send();
-        }
+                <script>
+                        document.addEventListener("DOMContentLoaded",async ()=> {
+var uid=localStorage.getItem('uidd');
+var sessionId=localStorage.getItem('sessionid');
+  try{
+     const response  = await fetch('https://10.191.171.12:5443/EISHOME/awthenticationService/authenticatePortal/',{
+     method:'POST',
+     headers:{
+             'Content-Type':'application/json',
+             'Authorization': `Bearer ${sessionId}`
 
-        function initializeDataTable() {
-            console.log("Initializing DataTable...");
-            var table = $('#myTable').DataTable({
-                "processing": true,
-                "pageLength": 10,
-                "responsive": true,
-                dom: 'lBfrtip',
-                "lengthMenu": [10, 25, 50, 100],
-                "buttons": [
-                    {
-                        extend: 'collection',
-                        text: '<i class="fas fa-download"></i> Export',
-                        className: 'dt-button',
-                        buttons: [
-                            {
-                                extend: 'copy',
-                                text: '<i class="fas fa-copy"></i> Copy'
-                            },
-                            {
-                                extend: 'excel',
-                                text: '<i class="fas fa-file-excel"></i> Excel'
-                            },
-                            {
-                                extend: 'csv',
-                                text: '<i class="fas fa-file-csv"></i> CSV'
-                            }
-                        ]
-                    }
-                ],
-                "initComplete": function() {
-                    console.log("DataTable initialized successfully");
-                    
-                    // Add column filters
-                    $("#myTable tfoot th").each(function(i) {
-                        var select = $('<select><option value=""></option></select>')
-                            .appendTo($(this).empty())
-                            .on('change', function() {
-                                table.column(i)
-                                    .search($(this).val())
-                                    .draw();
-                            });
+    },
+    body: JSON.stringify({uid})
+    });
+    const data = await response.json();
+    if(data.status==302){
+            console.log("login successfull");
+    }
+    else{
+            console.log(data.status)
+          window.location.href='https://10.191.171.12:5443/EISHOME/';
+    }
+  }
+catch(e){
+console.log("an error occured for login"+e)
 
-                        table.column(i).data().unique().sort().each(function(d, j) {
-                            select.append('<option value="' + d + '">' + d + '</option>')
+}
+});
+                        $( window ).on("load", function() {
+
+
+                                initializeDataTable();
+
+
+
+
+
+
                         });
-                    });
+
+
+
+                        function initializeDataTable()
+                        {
+                                 console.log( "appling data table filter ...." );
+                                 var table = $('#myTable').DataTable({
+
+
+                                        "processing":true,
+                                        "pageLength": 10,
+                                         dom: 'lBfrtip',
+
+
+
+
+                                        "lengthMenu": [10,25,50,100],
+                                        "buttons": [
+                                         {
+                                                extend: 'collection',
+                                                text: 'Export',
+                                                buttons: [
+                                                    'copy',
+                                                    'excel',
+                                                    'csv',
+                                                ]
+                                        }
+                                        ]
+
+
+
+                                });
+
+                                $("#myTable tfoot th").each( function ( i ) {
+                                        var select = $('<select><option value=""></option></select>')
+                                            .appendTo( $(this).empty() )
+                                            .on( 'change', function () {
+                                                table.column( i )
+                                                    .search( $(this).val() )
+                                                    .draw();
+                                    } );
+
+                                table.column( i ).data().unique().sort().each( function ( d, j ) {
+                                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                                } );
+                            } );
+
+
+                              console.log( "table filter applied  ...." );
+
+                        }
+
+
+                        $(window).on('beforeunload',function(){
+
+                                initializeDataTable();
+
+                        });
+
+
+
+
+
+
+                </script>
+
+
+
+
+        </body>
+
+
+</html>index.html
+-rwxr-xr-x  1 eisuser eisuser   9903 Jun 28  2023 index.html_bkp
+-rwxr-xr-x  1 eisuser eisuser  18837 Aug 27  2024 index1.html
+-rwxr-xr-x  1 eisuser eisuser     28 Jun 28  2023 index2.php
+-rwxr-xr-x  1 eisuser eisuser  18545 Aug 27  2024 index_28_aug_204.html
+-rwxr-xr-x  1 eisuser eisuser  19203 Aug 23  2024 index_bkp.html
+-rwxr-xr-x  1 eisuser eisuser  86840 Jun 28  2023 jquery.dataTables.min.js
+-rwxr-xr-x  1 eisuser eisuser 298512 Nov 10 19:15 jquery.js
+-rwxr-xr-x  1 eisuser eisuser  95993 Jun 28  2023 jquery.min.js
+drwxr-xr-x  5 eisuser eisuser     41 Apr  5  2024 media
+drwxr-xr-x  4 eisuser eisuser     84 Apr  5  2024 scripts
+drwxr-xr-x  3 eisuser eisuser     18 Apr  5  2024 select2
+-rwxr-xr-x  1 eisuser eisuser   1888 Jun 24 18:56 sql_insert.sh
+-rwxr-xr-x  1 eisuser eisuser    575 Jun 28  2023 tmp.txt
+drwxr-xr-x 14 eisuser eisuser   4096 Apr  5  2024 vendor
+[root@eispr-prt1-01 Compliance]# cat index.html
+<html>
+
+        <head>
+                <title>
+                        Compliance Monitoring
+                </title>
+
+
+
+        </head>
+        <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="vendor/datatables/css/jquery.dataTables.css">-->
+
+
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="./authentication.js"></script>
+
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js"></script>
+<script type="text/javascript" src="script/script.js"></script>
+
+        <style>
+                .top_container
+                {
+                    display: flex;
+                    padding: 15px 20px;
+                    font-weight: 700;
+                    color: #fff;
+                    text-align: center;
+                    background-color: #0275d8;
+                    #width:100%;
                 }
-            });
+                .middle_container
+                {
+                    margin-top:1%;
+                    #border:2px solid #d8d8e5;
+                    #overflow-x:auto;
+                }
+                .box
+                {
+                        #border:2px solid #f0f0ff;
+                        border:4px solid #f0f0ff;
+                        background:#ffffff;
+                        //text-align:center;
+                        overflow:hidden;
+                        padding:0;
+
+                }
+                body
+                {
+                        background:#f0f0ff;
+                }
+                table
+                {
+                        width:100%;
+                        border:1px solid #f0f0ff;
+                        padding:1%;
+
+                }
+                .center
+                {
+                        text-align:center;
+                }
+                td,th
+                {
+                        background:#ffffff;
+                        text-align:center;
+                        padding:5;
+                        font-size:12px;
+
+                }
+
+                .avail
+                {
+                        color:green;
+
+                }
+                .not-avail
+                {
+                        color:red;
+                }
+                .glyphicon
+                {
+                        font-size:24px;
+                }
+                #myTable_wrapper{
+                        width:100%;
+
+                }
+
+
+
+
+
+
+
+
+                 .dataTables_length {
+                        margin-top:50px;
+                  }
+                  div.dt-buttons {
+                    position: relative;
+                    float: left;
+                    margin-left: 20px;
+                    margin-top:12px;
+                    font-size:16px;
+                    font-weight:bold;
+                    margin-bottom:10px;
+                 }
+                 .dataTables_filter {
+                         margin-top:20px;
+                 }
+                 .buttons-html5{
+                        width:100%;
+                }
+
+
+
+        </style>
+
+        <body>
+                <div class="container top_container">
+                        PROD Compliance Monitoring
+                        <a href="data/service_status.csv" style="color:white;margin-right:0px;margin-left:auto;"> Download </a>
+                </div>
+
+                <marquee direction="left" style="margin-top:1%;font-size: 150%;">
+                        The data on this Portal is updated on an hourly basis.
+                </marquee>
+
+
+                <div class="container-fluid middle_container" style="text-align:center;width:95%;">
+                        <div class="row">
+                                <div class="col-sm-1o" id="data">
+                                        <!--<table id="myTable">
+                                        </table> -->
+                                </div>
+
+
+                        </div>
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const uid = localStorage.getItem('uidd');
+    const sessionId = localStorage.getItem('sessionid');
+
+    if (!uid || !sessionId) {
+        console.log("No auth tokens - redirecting to login");
+        redirectToLogin();
+        return;
+    }
+
+    try {
+        const response = await fetch('https://10.191.171.12:5443/EISHOME/awthenticationService/authenticatePortal/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionId}`
+            },
+            body: JSON.stringify({ uid })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Auto-refresh every hour
-        setInterval(() => {
-            getData();
-            updateRefreshTime();
-        }, 3600000);
-    </script>
-</body>
+        const data = await response.json();
+        console.log("Auth response:", data);
+
+        if (data.status === 302 || data.success === true) {
+            console.log("Authentication successful");
+            // Continue with app
+        } else {
+            console.log("Authentication failed - redirecting");
+            redirectToLogin();
+        }
+    } catch (error) {
+        console.error("Auth error:", error);
+        redirectToLogin();
+    }
+});
+
+function redirectToLogin() {
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `https://10.191.171.12:5443/EISHOME/?return_url=${currentUrl}`;
+}
+
+
+
+
+                        function getData()
+                        {
+
+                          function createHeader(tr,table,header_list)
+                          {
+                                const thead = document.createElement("thead");
+
+                                header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                                for(var i=0; i <= header_list.length-1;i++)
+                                {
+                                        //console.log(header_list[i]);
+                                        const th = document.createElement("th");
+                                        th.innerHTML=header_list[i];
+                                        th.classList.add("center");
+                                        tr.appendChild(th);
+
+                                }
+
+                                thead.appendChild(tr);
+                                table.appendChild(thead);
+
+
+                          }
+                          var monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                          var xhttp = new XMLHttpRequest();
+                          xhttp.onreadystatechange = function()
+                          {
+                                if (this.readyState == 4 && this.status == 200)
+                                {
+                                        const table = document.createElement("table");
+                                        //const table  = document.getElementById("myTable");
+                                        const tbody = document.createElement("tbody");
+                                        table.setAttribute("border","1");
+                                        table.classList.add("table-responsive");
+                                        table.classList.add("table-bordered");
+                                        table.classList.add("display");
+
+                                        table.setAttribute("id","myTable");
+                                        const tr = document.createElement("tr");
+
+                                        createHeader(tr,table);
+
+                                        const data_div = document.getElementById("data");
+
+                                        /*
+                                        const tr = document.createElement("tr");
+                                        const td = document.createElement("td");
+                                        const td1 = document.createElement("td");
+                                        const td2 = document.createElement("td");
+                                        const td3 = document.createElement("td");
+
+                                        //const td4 = document.createElement("td");
+                                        table.setAttribute("border","1");
+
+                                        table.classList.add("table-responsive");
+                                        table.classList.add("table-bordered");
+                                        //const data_div = document.getElementById("data");
+
+                                        console.log("all ok");
+                                        td.innerHTML="&nbsp &nbsp";
+                                        td1.innerHTML="DS Agent";
+                                        td2.innerHTML="Splunk Status";
+                                        td3.innerHTML="Imperva Status";
+
+                                        td.classList.add("center");
+
+                                        td1.classList.add("center");
+                                        td2.classList.add("center");
+
+                                        td3.classList.add("center");
+                                        tr.appendChild(td);
+                                        tr.appendChild(td1);
+                                        tr.appendChild(td2);
+
+                                        tr.appendChild(td3);
+
+
+                                        table.appendChild(tr);*/
+                                        //data_div.appendChild(table);
+
+                                        row_data=this.responseText.split("\n");
+                                        for (var i = 0; i < row_data.length-1; i++)
+                                        {
+                                                col=row_data[i].split(",");
+                                                col_length = col.length-1
+                                                const tr1 = document.createElement("tr");
+                                                const td_counter = document.createElement("td");
+                                                td_counter.innerHTML=i+1;
+                                                tr1.appendChild(td_counter);
+                                                for (let j = 0; j <=col_length ;j++ )
+                                                {
+                                                        //console.log(j," ",col[j]);
+                                                        const td_service = document.createElement("td");
+                                                        td_service.setAttribute("id",col[j]);
+                                                        if( col[j] == "DSrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if( col[j] == "DSnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+
+                                                        else if( col[j] == "SPLrunning" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+                                                         else if( col[j] == "SPLnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if( col[j] == "Ragentrunning" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+                                                         else if( col[j] == "Ragentnotrunning" )
+                                                        {
+                                                                //<span class="glyphicon glyphicon-ok-circle"></span>
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+                                                        }
+                                                        else if ( col[j] == "active" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ok-circle");
+
+                                                                span_element.classList.add("avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+                                                        else if ( col[j] == "inactive" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-remove-circle");
+
+                                                                span_element.classList.add("not-avail");
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+                                                        else if ( col[j] == "DS_someissue" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+                                                        else if ( col[j] == "SPL_someissue" )
+                                                        {
+
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+
+                                                                td_service.appendChild(span_element);
+
+
+                                                        }
+
+
+
+
+
+
+
+                                                        else if ( col[j] == "undefined" )
+                                                        {
+                                                                span_element = document.createElement("span");
+
+                                                                span_element.classList.add("glyphicon");
+                                                                span_element.classList.add("glyphicon-ban-circle");
+                                                                td_service.appendChild(span_element);
+                                                        }
+
+
+                                                        else if ( col[j] == "" )
+                                                        {
+                                                                //col[j] == "issue while fetching data";
+                                                                td_service.innerHTML="issue";
+                                                        }
+
+                                                        else
+                                                        {
+                                                                //<span class="glyphicon glyphicon-remove-circle"></span>
+                                                                var foundMonths=monthNames.filter(month => col[j].includes(month));
+                                                                if ( foundMonths.length > 0 && j != 9)
+                                                                {
+                                                                        console.log("month found in",j);
+                                                                        const today = new Date();
+                                                                        const targetDate=new Date(col[j]);
+                                                                        const diffmili=targetDate-today;
+                                                                        const diff=Math.round(diffmili/(1000 * 60 * 60 * 24));
+                                                                        td_service.innerHTML=col[j];
+
+                                                                        if ( diff <=5 )
+                                                                        {
+                                                                                td_service.style.backgroundColor="red";
+                                                                        }
+                                                                        else if ( diff >=6 && diff <=10 )
+                                                                        {
+
+                                                                                td_service.style.backgroundColor="orange";
+                                                                        }
+                                                                        else if ( diff <=11 && diff <=15)
+                                                                        {
+
+                                                                                td_service.style.backgroundColor="yellow";
+
+
+                                                                        }
+
+                                                                }
+                                                                else
+                                                                {
+
+
+                                                                        td_service.innerHTML=col[j];
+                                                                        //console.log("print case");
+                                                                }
+                                                        }
+                                                        tr1.appendChild(td_service);
+                                                        tbody.appendChild(tr1);
+                                                }
+
+                                        }
+                                        const tfoot = document.createElement("tfoot");
+                                        const tr_element = document.createElement("tr");
+
+                                        header_list = ["Server No.","IP Address","File System","Last Updated","Up Time","Server Role","RAM","CPU Core","OS Version","Kernel Version","Kernel Update","Ace Version","MQ Version","Firewall","RPM Count","DS Agent","Splunk","Ragent","Reference ID","System time","eisuser exp","root exp","SOCVA exp","addmitam exp"];
+                                        for(var i=0; i <= header_list.length-1;i++)
+                                        {
+                                                //console.log(header_list[i]);
+                                                const th = document.createElement("th");
+                                                th.innerHTML=header_list[i];
+                                                th.classList.add("center");
+                                                tr_element.appendChild(th);
+
+                                        }
+                                        tfoot.appendChild(tr_element);
+
+
+
+
+                                        table.appendChild(tbody);
+                                         table.appendChild(tfoot);
+                                        data_div.appendChild(table);
+
+
+
+
+                                }
+                          };
+                          let file_name = "data/combine.txt";
+                          xhttp.open("GET",file_name, true);
+                          xhttp.send();
+                          console.log("Table Created");
+                        }
+
+
+                                getData();
+                </script>
+
+                 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.dataTables.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+                 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
+                <script type="text/javascript" charset="utf8" src="vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+                <script type="text/javascript" charset="utf8" src="vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+                <script>
+                        document.addEventListener("DOMContentLoaded",async ()=> {
+var uid=localStorage.getItem('uidd');
+var sessionId=localStorage.getItem('sessionid');
+  try{
+     const response  = await fetch('https://10.191.171.12:5443/EISHOME/awthenticationService/authenticatePortal/',{
+     method:'POST',
+     headers:{
+             'Content-Type':'application/json',
+             'Authorization': `Bearer ${sessionId}`
+
+    },
+    body: JSON.stringify({uid})
+    });
+    const data = await response.json();
+    if(data.status==302){
+            console.log("login successfull");
+    }
+    else{
+            console.log(data.status)
+          window.location.href='https://10.191.171.12:5443/EISHOME/';
+    }
+  }
+catch(e){
+console.log("an error occured for login"+e)
+
+}
+});
+                        $( window ).on("load", function() {
+
+
+                                initializeDataTable();
+
+
+
+
+
+
+                        });
+
+
+
+                        function initializeDataTable()
+                        {
+                                 console.log( "appling data table filter ...." );
+                                 var table = $('#myTable').DataTable({
+
+
+                                        "processing":true,
+                                        "pageLength": 10,
+                                         dom: 'lBfrtip',
+
+
+
+
+                                        "lengthMenu": [10,25,50,100],
+                                        "buttons": [
+                                         {
+                                                extend: 'collection',
+                                                text: 'Export',
+                                                buttons: [
+                                                    'copy',
+                                                    'excel',
+                                                    'csv',
+                                                ]
+                                        }
+                                        ]
+
+
+
+                                });
+
+                                $("#myTable tfoot th").each( function ( i ) {
+                                        var select = $('<select><option value=""></option></select>')
+                                            .appendTo( $(this).empty() )
+                                            .on( 'change', function () {
+                                                table.column( i )
+                                                    .search( $(this).val() )
+                                                    .draw();
+                                    } );
+
+                                table.column( i ).data().unique().sort().each( function ( d, j ) {
+                                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                                } );
+                            } );
+
+
+                              console.log( "table filter applied  ...." );
+
+                        }
+
+
+                        $(window).on('beforeunload',function(){
+
+                                initializeDataTable();
+
+                        });
+
+
+
+
+
+
+                </script>
+
+
+
+
+        </body>
+
+
 </html>
